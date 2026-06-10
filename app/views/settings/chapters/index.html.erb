@@ -1,33 +1,43 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <%= render "shared/flash" %>
-  <h1 class="font-bold text-3xl mb-4">Settings</h1>
+<%= render "shared/flash" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Settings</h1>
+  <%= link_to "Create New Chapter", new_settings_chapter_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+</div>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
   <%= render "settings/nav" %>
 
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="font-semibold text-xl">Chapters</h2>
-    <%= link_to "New chapter", new_settings_chapter_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
-  </div>
-
-  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
-    <% @chapters.each do |chapter| %>
-      <div class="p-4 flex items-center justify-between">
-        <div>
-          <div class="font-medium">
-            <%= chapter.name %>
-            <% if chapter.default? %><span class="text-xs text-gray-400 dark:text-slate-500 ml-1">(default)</span><% end %>
-          </div>
-          <div class="text-sm text-gray-500 dark:text-slate-400">
-            <%= PhoneNumber.format(chapter.phone_number).presence || "No phone number" %>
-            · <%= pluralize(chapter.chapter_zip_codes.size, "zip code") %>
-          </div>
-        </div>
-        <div class="flex gap-3">
-          <%= link_to "Edit", edit_settings_chapter_path(chapter), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
-          <% unless chapter.default? %>
-            <%= button_to "Delete", settings_chapter_path(chapter), method: :delete, data: { turbo_confirm: "Delete this chapter?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+  <table class="w-full text-left">
+    <thead>
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <th class="px-6 py-4 font-semibold">Chapter</th>
+        <th class="px-4 py-4 font-semibold">Phone number</th>
+        <th class="px-4 py-4 font-semibold">Zip coverage</th>
+        <th class="px-4 py-4 font-semibold">People</th>
+        <th class="px-4 py-4 font-semibold text-right pr-6">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% @chapters.each do |chapter| %>
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4">
+            <span class="font-medium text-gray-900 dark:text-white"><%= chapter.name %></span>
+            <% if chapter.default? %><%= status_pill "Default", :blue %><% end %>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= format_phone(chapter.phone_number).presence || "—" %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= pluralize(chapter.chapter_zip_codes.size, "zip code") %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= chapter.people.count %></td>
+          <td class="px-4 py-4 pr-6">
+            <div class="flex gap-3 justify-end">
+              <%= link_to "Edit", edit_settings_chapter_path(chapter), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+              <% unless chapter.default? %>
+                <%= button_to "Delete", settings_chapter_path(chapter), method: :delete, data: { turbo_confirm: "Delete this chapter?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

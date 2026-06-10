@@ -1,22 +1,27 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <%= render "shared/flash" %>
-  <h1 class="font-bold text-3xl mb-4">Settings</h1>
+<%= render "shared/flash" %>
+
+<h1 class="font-bold text-3xl text-gray-900 dark:text-white mb-6">Settings</h1>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
   <%= render "settings/nav" %>
 
   <%= form_with model: @organization, url: settings_organization_path, method: :patch, class: "contents" do |form| %>
-    <div class="my-5">
-      <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
+    <div class="divide-y divide-gray-100 dark:divide-slate-700/40">
+      <%= form_row "Organization name" do %>
+        <%= form.text_field :name, required: true, class: ui_input %>
+      <% end %>
+
+      <%= form_row "Public URL slug", hint: "Used for public pages: /o/#{@organization.slug}/..." do %>
+        <%= form.text_field :slug, required: true, class: ui_input %>
+      <% end %>
+
+      <%= form_row "Time zone", hint: "Scheduling and event times are shown in this zone." do %>
+        <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: ui_input } %>
+      <% end %>
+
+      <%= form_actions do %>
+        <%= form.submit "Save Settings", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+      <% end %>
     </div>
-    <div class="my-5">
-      <%= form.label :slug, "Public URL slug", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= form.text_field :slug, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
-      <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">Used for public pages: /o/<%= @organization.slug %>/...</p>
-    </div>
-    <div class="my-5">
-      <%= form.label :time_zone, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" } %>
-    </div>
-    <%= form.submit "Save", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
   <% end %>
 </div>

@@ -1,28 +1,40 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <%= render "shared/flash" %>
-  <h1 class="font-bold text-3xl mb-4">Settings</h1>
+<%= render "shared/flash" %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Settings</h1>
+  <%= link_to "Invite Member", new_settings_member_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+</div>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
   <%= render "settings/nav" %>
 
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="font-semibold text-xl">Members</h2>
-    <%= link_to "Invite member", new_settings_member_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
-  </div>
-
-  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
-    <% @memberships.each do |membership| %>
-      <div class="p-4 flex items-center justify-between">
-        <div>
-          <div class="font-medium"><%= membership.user.name %></div>
-          <div class="text-sm text-gray-500 dark:text-slate-400">
-            <%= membership.user.email_address %>
-            · <span class="capitalize"><%= membership.role %></span>
-            · <%= membership.org_wide? ? "All chapters" : membership.access_scope.name %>
-          </div>
-        </div>
-        <% unless membership.user == Current.user %>
-          <%= button_to "Remove", settings_member_path(membership), method: :delete, data: { turbo_confirm: "Remove this member?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+  <table class="w-full text-left">
+    <thead>
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <th class="px-6 py-4 font-semibold">Member</th>
+        <th class="px-4 py-4 font-semibold">Role</th>
+        <th class="px-4 py-4 font-semibold">Access</th>
+        <th class="px-4 py-4 font-semibold text-right pr-6">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% @memberships.each do |membership| %>
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4">
+            <div class="font-medium text-gray-900 dark:text-white"><%= membership.user.name %></div>
+            <div class="text-sm text-gray-500 dark:text-slate-400"><%= membership.user.email_address %></div>
+          </td>
+          <td class="px-4 py-4"><%= status_pill membership.role.capitalize, membership.admin? ? :blue : :gray %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= membership.org_wide? ? "All chapters" : membership.access_scope.name %></td>
+          <td class="px-4 py-4 pr-6">
+            <div class="flex justify-end">
+              <% unless membership.user == Current.user %>
+                <%= button_to "Remove", settings_member_path(membership), method: :delete, data: { turbo_confirm: "Remove this member?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

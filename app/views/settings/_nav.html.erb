@@ -1,6 +1,6 @@
-<div class="flex gap-4 border-b border-gray-200 dark:border-slate-700/70 mb-6 pb-2">
-  <%= link_to "Organization", settings_organization_path, class: "text-sm #{controller_name == 'organizations' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'}" %>
-  <%= link_to "Chapters", settings_chapters_path, class: "text-sm #{controller_name == 'chapters' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'}" %>
-  <%= link_to "Members", settings_members_path, class: "text-sm #{controller_name == 'members' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'}" %>
-  <%= link_to "Custom fields", settings_custom_fields_path, class: "text-sm #{controller_name == 'custom_fields' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'}" %>
+<div class="flex gap-8 px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70">
+  <%= tab_link "Organization", settings_organization_path, active: controller_name == "organizations" %>
+  <%= tab_link "Chapters", settings_chapters_path, active: controller_name == "chapters" %>
+  <%= tab_link "Members", settings_members_path, active: controller_name == "members" %>
+  <%= tab_link "Properties", settings_custom_fields_path, active: controller_name == "custom_fields" %>
 </div>
