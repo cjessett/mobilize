@@ -1,11 +1,18 @@
 class Event < ApplicationRecord
   include Scopable
 
+  EVENT_TYPES = { "in_person" => "In-Person", "virtual" => "Virtual", "hybrid" => "Hybrid" }.freeze
+
   belongs_to :host, class_name: "User", optional: true
   has_many :rsvps, dependent: :destroy
   has_many :attendees, through: :rsvps, source: :person
 
   validates :title, :starts_at, presence: true
+  validates :event_type, inclusion: { in: EVENT_TYPES.keys }
+
+  def event_type_label
+    EVENT_TYPES[event_type]
+  end
 
   scope :upcoming, -> { where(starts_at: Time.current..).order(:starts_at) }
   scope :past, -> { where(starts_at: ...Time.current).order(starts_at: :desc) }

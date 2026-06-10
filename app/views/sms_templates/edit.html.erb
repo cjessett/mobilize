@@ -1,4 +1,3 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <h1 class="font-bold text-3xl mb-4">Edit template</h1>
-  <%= render "form", template: @template %>
-</div>
+<%= back_link "SMS Templates", sms_templates_path %>
+<h1 class="font-bold text-3xl text-gray-900 dark:text-white mt-2">Edit Template</h1>
+<%= render "form", template: @template %>

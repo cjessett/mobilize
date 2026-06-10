@@ -1,21 +1,38 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-center justify-between mb-4">
-  <h1 class="font-bold text-3xl">Email blasts</h1>
-  <%= link_to "New email blast", new_email_blast_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Email Blasts</h1>
+  <%= link_to "Create New Email Blast", new_email_blast_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
-<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
-  <% if @email_blasts.empty? %>
-    <p class="p-6 text-gray-500 dark:text-slate-400">No email blasts yet.</p>
-  <% end %>
-  <% @email_blasts.each do |blast| %>
-    <div class="p-4 flex items-center justify-between">
-      <div>
-        <%= link_to blast.name, blast, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
-        <div class="text-sm text-gray-500 dark:text-slate-400"><%= blast.subject %></div>
-      </div>
-      <span class="text-xs rounded-full px-2 py-0.5 <%= { 'draft' => 'bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300', 'scheduled' => 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300', 'sending' => 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400', 'sent' => 'bg-green-500/10 text-green-600 dark:text-green-400', 'failed' => 'bg-red-500/10 text-red-600 dark:text-red-400', 'canceled' => 'bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-slate-500' }[blast.status] %>"><%= blast.status %></span>
-    </div>
-  <% end %>
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <th class="px-6 py-4 font-semibold">Name</th>
+        <th class="px-4 py-4 font-semibold">Subject</th>
+        <th class="px-4 py-4 font-semibold">Audience</th>
+        <th class="px-4 py-4 font-semibold">Scheduled / Sent</th>
+        <th class="px-4 py-4 font-semibold">Status</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% if @email_blasts.empty? %>
+        <tr><td colspan="5" class="px-6 py-8 text-gray-500 dark:text-slate-400">No email blasts yet.</td></tr>
+      <% end %>
+      <% @email_blasts.each do |blast| %>
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4"><%= link_to blast.name, blast, class: "font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-300" %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= blast.subject.truncate(50) %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= blast.segment&.name || "Everyone" %></td>
+          <td class="px-4 py-4 text-sm text-gray-400 dark:text-slate-500">
+            <%= (blast.sent_at || blast.scheduled_at)&.in_time_zone(current_organization.time_zone)&.strftime("%b %-d, %-l:%M%P") || "—" %>
+          </td>
+          <td class="px-4 py-4">
+            <%= status_pill blast.status.capitalize, { "draft" => :gray, "scheduled" => :yellow, "sending" => :blue, "sent" => :green, "failed" => :red, "canceled" => :gray }[blast.status] %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

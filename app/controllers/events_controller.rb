@@ -2,8 +2,9 @@ class EventsController < ApplicationController
   before_action :set_event, only: [ :show, :edit, :update, :destroy, :check_in ]
 
   def index
-    @upcoming = Event.visible_to(current_membership).upcoming
-    @past = Event.visible_to(current_membership).past.limit(20)
+    @tab = params[:tab] == "past" ? "past" : "upcoming"
+    events = Event.visible_to(current_membership)
+    @events = @tab == "past" ? events.past.limit(50) : events.upcoming
   end
 
   def show
@@ -52,7 +53,7 @@ class EventsController < ApplicationController
   end
 
   def event_attributes
-    permitted = params.require(:event).permit(:title, :description, :starts_at, :ends_at, :location, :virtual_url, :capacity, :access_scope_gid)
+    permitted = params.require(:event).permit(:title, :description, :event_type, :starts_at, :ends_at, :location, :virtual_url, :capacity, :access_scope_gid)
     scope = case permitted.delete(:access_scope_gid)
     when /\Achapter-(\d+)\z/ then current_organization.chapters.find($1)
     else current_organization

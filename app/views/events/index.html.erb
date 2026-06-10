@@ -1,37 +1,49 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-center justify-between mb-4">
-  <h1 class="font-bold text-3xl">Events</h1>
-  <%= link_to "New event", new_event_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">All Events</h1>
+  <%= link_to "Create New Event", new_event_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
-<h2 class="font-semibold text-lg mb-2">Upcoming</h2>
-<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60 mb-6">
-  <% if @upcoming.empty? %>
-    <p class="p-6 text-gray-500 dark:text-slate-400">No upcoming events.</p>
-  <% end %>
-  <% @upcoming.each do |event| %>
-    <div class="p-4 flex items-center justify-between">
-      <div>
-        <%= link_to event.title, event, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
-        <div class="text-sm text-gray-500 dark:text-slate-400">
-          <%= event.starts_at.in_time_zone(current_organization.time_zone).strftime("%a %b %-d, %l:%M %p") %>
-          <%= " · #{event.location}" if event.location.present? %>
-        </div>
-      </div>
-      <span class="text-sm text-gray-400 dark:text-slate-500"><%= event.yes_rsvps.count %><%= "/#{event.capacity}" if event.capacity %> going</span>
-    </div>
-  <% end %>
-</div>
-
-<% if @past.any? %>
-  <h2 class="font-semibold text-lg mb-2">Past</h2>
-  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
-    <% @past.each do |event| %>
-      <div class="p-4 flex items-center justify-between">
-        <%= link_to event.title, event, class: "text-gray-700 dark:text-slate-300 hover:underline" %>
-        <span class="text-sm text-gray-400 dark:text-slate-500"><%= event.starts_at.strftime("%b %-d, %Y") %> · <%= event.rsvps.where(attended: true).count %> attended</span>
-      </div>
-    <% end %>
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
+  <div class="flex gap-8 px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70">
+    <%= tab_link "Active & Upcoming Events", events_path, active: @tab == "upcoming" %>
+    <%= tab_link "Past Events", events_path(tab: "past"), active: @tab == "past" %>
   </div>
-<% end %>
+
+  <table class="w-full text-left">
+    <thead>
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <th class="px-6 py-4 font-semibold">Title</th>
+        <th class="px-4 py-4 font-semibold">Event type</th>
+        <th class="px-4 py-4 font-semibold">Yes RSVP'd</th>
+        <th class="px-4 py-4 font-semibold">Attended</th>
+        <th class="px-4 py-4 font-semibold">Session</th>
+        <th class="px-4 py-4 font-semibold">Status</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% if @events.empty? %>
+        <tr><td colspan="6" class="px-6 py-8 text-gray-500 dark:text-slate-400">No <%= @tab == "past" ? "past" : "upcoming" %> events.</td></tr>
+      <% end %>
+      <% @events.each do |event| %>
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4">
+            <%= link_to event.title, event, class: "font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-300" %>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= event.event_type_label %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= event.yes_rsvps.count %><%= "/#{event.capacity}" if event.capacity %></td>
+          <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= event.rsvps.where(attended: true).count %></td>
+          <td class="px-4 py-4 text-sm text-gray-400 dark:text-slate-500"><%= event.starts_at.in_time_zone(current_organization.time_zone).strftime("%b %-d, %-l:%M%P") %></td>
+          <td class="px-4 py-4">
+            <% if @tab == "past" %>
+              <%= status_pill "Past", :gray %>
+            <% else %>
+              <%= status_pill "Upcoming", :green %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

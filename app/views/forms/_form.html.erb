@@ -1,69 +1,74 @@
 <%= form_with model: form, class: "contents" do |f| %>
   <% if form.errors.any? %>
-    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= form.errors.full_messages.to_sentence %></p>
+    <p class="py-2 px-3 bg-red-500/10 mt-4 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= form.errors.full_messages.to_sentence %></p>
   <% end %>
 
-  <div class="my-5 flex gap-4">
-    <div class="flex-1">
-      <%= f.label :title, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= f.text_field :title, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
-    </div>
-    <div>
-      <%= f.label :kind, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= f.select :kind, Form::KINDS.map { |k| [ k.capitalize, k ] }, {}, { class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" } %>
-    </div>
-    <div>
-      <%= f.label :goal, "Goal (petitions)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= f.number_field :goal, min: 1, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60 w-28" %>
-    </div>
-  </div>
+  <%= form_card do %>
+    <%= form_row "Title" do %>
+      <%= f.text_field :title, required: true, class: ui_input %>
+    <% end %>
 
-  <div class="my-5">
-    <%= f.label :description, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-    <%= f.text_area :description, rows: 3, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
-  </div>
-
-  <div class="my-5 grid md:grid-cols-2 gap-4">
-    <div>
-      <%= f.label :confirmation_message, "Confirmation message", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= f.text_field :confirmation_message, placeholder: "Thanks — you're in!", class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Apply tag on submission</label>
-      <%= text_field_tag "form[apply_tag_name]", form.apply_tag&.name, placeholder: "e.g. petition-signer", class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
-    </div>
-  </div>
-
-  <div class="my-5">
-    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Scope</label>
-    <%= select_tag "form[access_scope_gid]",
-          options_for_select(
-            [ [ "Organization-wide", "organization" ] ] + current_organization.chapters.order(:name).map { |c| [ c.name, "chapter-#{c.id}" ] },
-            form.access_scope.is_a?(Chapter) ? "chapter-#{form.access_scope_id}" : "organization"
-          ),
-          class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" %>
-  </div>
-
-  <h3 class="font-semibold text-sm text-gray-700 dark:text-slate-300 mb-2">Fields</h3>
-  <% existing = form.form_fields.index_by(&:key) %>
-  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
-    <% Form::BUILTIN_FIELDS.merge(current_organization.custom_fields.pluck(:key, :label).to_h).each do |key, default_label| %>
-      <% field = existing[key] %>
-      <div class="p-3 flex items-center gap-4">
-        <label class="flex items-center gap-2 w-44 text-sm">
-          <%= check_box_tag "form[fields][#{key}][include]", "1", field.present? || (form.new_record? && Form::BUILTIN_FIELDS.key?(key)) %>
-          <span class="font-medium"><%= default_label %></span>
-        </label>
-        <label class="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
-          <%= check_box_tag "form[fields][#{key}][required]", "1", field&.required? || (form.new_record? && key == "first_name") %> required
-        </label>
-        <%= text_field_tag "form[fields][#{key}][label]", field&.label, placeholder: "Label override", class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 flex-1" %>
+    <%= form_row "Type" do %>
+      <div class="space-y-4">
+        <% { "signup" => [ "Signup", "Collect new supporters into your CRM." ],
+             "petition" => [ "Petition", "Public signature count with an optional goal." ] }.each do |value, (label, description)| %>
+          <label class="flex items-start gap-3 cursor-pointer">
+            <%= f.radio_button :kind, value, class: "mt-1 h-5 w-5 accent-indigo-500" %>
+            <span>
+              <span class="block font-medium text-gray-900 dark:text-white"><%= label %></span>
+              <span class="block text-sm text-gray-400 dark:text-slate-500"><%= description %></span>
+            </span>
+          </label>
+        <% end %>
       </div>
     <% end %>
-  </div>
-  <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">Add more fields under Settings → Custom fields.</p>
 
-  <div class="mt-6">
-    <%= f.submit form.persisted? ? "Save form" : "Create form", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
-  </div>
+    <%= form_row "Goal", hint: "Petitions show progress toward this signature goal." do %>
+      <%= f.number_field :goal, min: 1, class: "#{ui_input} md:w-40" %>
+    <% end %>
+
+    <%= form_row "Description" do %>
+      <%= f.text_area :description, rows: 3, class: ui_input %>
+    <% end %>
+
+    <%= form_row "Confirmation message", hint: "Shown after someone submits." do %>
+      <%= f.text_field :confirmation_message, placeholder: "Thanks — you're in!", class: ui_input %>
+    <% end %>
+
+    <%= form_row "Apply tag", hint: "Added to everyone who submits." do %>
+      <%= text_field_tag "form[apply_tag_name]", form.apply_tag&.name, placeholder: "e.g. petition-signer", class: ui_input %>
+    <% end %>
+
+    <%= form_row "Scope" do %>
+      <%= select_tag "form[access_scope_gid]",
+            options_for_select(
+              [ [ "Organization-wide", "organization" ] ] + current_organization.chapters.order(:name).map { |c| [ c.name, "chapter-#{c.id}" ] },
+              form.access_scope.is_a?(Chapter) ? "chapter-#{form.access_scope_id}" : "organization"
+            ),
+            class: ui_input %>
+    <% end %>
+
+    <%= form_row "Fields", hint: "Add more fields under People → Properties." do %>
+      <% existing = form.form_fields.index_by(&:key) %>
+      <div class="rounded-md border border-gray-200 dark:border-slate-700 divide-y divide-gray-100 dark:divide-slate-700/60">
+        <% Form::BUILTIN_FIELDS.merge(current_organization.custom_fields.pluck(:key, :label).to_h).each do |key, default_label| %>
+          <% field = existing[key] %>
+          <div class="p-3 flex items-center gap-4">
+            <label class="flex items-center gap-2 w-40 text-sm cursor-pointer">
+              <%= check_box_tag "form[fields][#{key}][include]", "1", field.present? || (form.new_record? && Form::BUILTIN_FIELDS.key?(key)), class: "accent-indigo-500" %>
+              <span class="font-medium text-gray-900 dark:text-white"><%= default_label %></span>
+            </label>
+            <label class="flex items-center gap-2 text-sm text-gray-400 dark:text-slate-500 cursor-pointer">
+              <%= check_box_tag "form[fields][#{key}][required]", "1", field&.required? || (form.new_record? && key == "first_name"), class: "accent-indigo-500" %> required
+            </label>
+            <%= text_field_tag "form[fields][#{key}][label]", field&.label, placeholder: "Label override", class: "rounded-md border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 px-2 py-1.5 text-sm flex-1" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form_actions do %>
+      <%= f.submit form.persisted? ? "Save Form" : "Create Form", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+    <% end %>
+  <% end %>
 <% end %>

@@ -1,4 +1,3 @@
-<div class="mx-auto md:w-3/4 w-full">
-  <h1 class="font-bold text-3xl mb-4">New segment</h1>
-  <%= render "form", segment: @segment %>
-</div>
+<%= back_link "Lists", segments_path %>
+<h1 class="font-bold text-3xl text-gray-900 dark:text-white mt-2">Create a List</h1>
+<%= render "form", segment: @segment %>

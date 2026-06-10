@@ -1,49 +1,48 @@
 <%= form_with model: workflow, class: "contents", data: { controller: "steps" } do |form| %>
   <% if workflow.errors.any? %>
-    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= workflow.errors.full_messages.to_sentence %></p>
+    <p class="py-2 px-3 bg-red-500/10 mt-4 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= workflow.errors.full_messages.to_sentence %></p>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-    <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full md:w-1/2 bg-white dark:bg-slate-800/60" %>
-  </div>
+  <%= form_card do %>
+    <%= form_row "Workflow name" do %>
+      <%= form.text_field :name, required: true, class: ui_input %>
+    <% end %>
 
-  <div class="my-5 flex gap-4 items-end flex-wrap">
-    <div>
-      <%= form.label :trigger, "When", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+    <%= form_row "Trigger", hint: "When this happens, the workflow runs for that person." do %>
       <%= form.select :trigger,
             [ [ "Keyword received", "keyword_received" ], [ "Tag added", "tag_added" ], [ "Form submitted", "form_submitted" ], [ "Event RSVP", "rsvp_created" ], [ "Donation received", "donation_created" ] ],
-            {}, { class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" } %>
-    </div>
-    <div>
-      <%= form.label :trigger_param, "Matching (keyword/tag/form id — blank = any)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
-      <%= form.text_field :trigger_param, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" %>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Scope</label>
+            {}, { class: ui_input } %>
+    <% end %>
+
+    <%= form_row "Matching", hint: "Keyword, tag name, or form slug to match. Leave blank to match any." do %>
+      <%= form.text_field :trigger_param, class: ui_input %>
+    <% end %>
+
+    <%= form_row "Scope" do %>
       <%= select_tag "workflow[access_scope_gid]",
             options_for_select(
               [ [ "Organization-wide", "organization" ] ] + current_organization.chapters.order(:name).map { |c| [ c.name, "chapter-#{c.id}" ] },
               workflow.access_scope.is_a?(Chapter) ? "chapter-#{workflow.access_scope_id}" : "organization"
             ),
-            class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" %>
-    </div>
-  </div>
-
-  <h3 class="font-semibold text-sm text-gray-700 dark:text-slate-300 mb-2">Steps (run in order)</h3>
-  <div data-steps-target="rows" class="space-y-2">
-    <% workflow.workflow_steps.each do |step| %>
-      <%= render "step_row", step: step.params.merge("action" => step.action) %>
+            class: ui_input %>
     <% end %>
-  </div>
 
-  <template data-steps-target="template">
-    <%= render "step_row", step: {} %>
-  </template>
+    <%= form_row "Steps", hint: "Run in order from top to bottom." do %>
+      <div data-steps-target="rows" class="space-y-2">
+        <% workflow.workflow_steps.each do |step| %>
+          <%= render "step_row", step: step.params.merge("action" => step.action) %>
+        <% end %>
+      </div>
 
-  <button type="button" data-action="steps#add" class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add step</button>
+      <template data-steps-target="template">
+        <%= render "step_row", step: {} %>
+      </template>
 
-  <div class="mt-6">
-    <%= form.submit workflow.persisted? ? "Save workflow" : "Create workflow", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
-  </div>
+      <button type="button" data-action="steps#add" class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add step</button>
+    <% end %>
+
+    <%= form_actions do %>
+      <%= form.submit workflow.persisted? ? "Save Workflow" : "Create Workflow", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+    <% end %>
+  <% end %>
 <% end %>

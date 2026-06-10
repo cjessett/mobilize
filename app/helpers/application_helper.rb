@@ -3,6 +3,59 @@ module ApplicationHelper
     PhoneNumber.format(value)
   end
 
+  # Standard text input / select styling for forms.
+  def ui_input
+    "block w-full rounded-md border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 px-3 py-2.5 focus:outline-indigo-500"
+  end
+
+  def back_link(label, path)
+    link_to path, class: "inline-flex items-center gap-1 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white" do
+      tag.svg(viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", class: "h-4 w-4") {
+        tag.path(d: "M15.75 19.5L8.25 12l7.5-7.5", "stroke-linecap": "round", "stroke-linejoin": "round")
+      } + tag.span(label)
+    end
+  end
+
+  # Big settings-style form card; rows added with form_row.
+  def form_card(&block)
+    tag.div(class: "bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-100 dark:divide-slate-700/40 mt-4", &block)
+  end
+
+  # A form row with an uppercase label column on the left and the control
+  # (plus optional hint) on the right.
+  def form_row(label, hint: nil, &block)
+    tag.div(class: "grid md:grid-cols-[13rem_1fr] gap-2 md:gap-10 px-6 py-6 items-start") do
+      tag.span(label.upcase, class: "text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 md:pt-3") +
+        tag.div(class: "max-w-2xl") do
+          capture(&block) + (hint.present? ? tag.p(hint, class: "text-sm text-gray-400 dark:text-slate-500 mt-2") : "".html_safe)
+        end
+    end
+  end
+
+  def form_actions(&block)
+    tag.div(class: "px-6 py-5", &block)
+  end
+
+  def tab_link(label, path, active:)
+    classes = if active
+      "border-sky-400 text-gray-900 dark:text-white font-medium"
+    else
+      "border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
+    end
+    link_to label, path, class: "px-1 pb-3 -mb-px border-b-2 text-lg #{classes}"
+  end
+
+  def status_pill(label, tone = :gray)
+    colors = {
+      gray: "bg-gray-200 text-gray-600 dark:bg-slate-700 dark:text-slate-300",
+      green: "bg-green-500/10 text-green-600 dark:text-green-400",
+      yellow: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-300",
+      blue: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-300",
+      red: "bg-red-500/10 text-red-600 dark:text-red-400"
+    }
+    tag.span(label, class: "text-xs rounded-md px-2.5 py-1 font-medium #{colors.fetch(tone)}")
+  end
+
   def sidebar_link(label, path, icon:, active:)
     classes = if active
       "bg-indigo-500/10 text-indigo-700 dark:text-white border-l-2 border-indigo-500"
