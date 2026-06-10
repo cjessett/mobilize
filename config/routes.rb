@@ -43,6 +43,20 @@ Rails.application.routes.draw do
   get "email/open/:token", to: "email_tracking#open", as: :email_open
   resources :keywords, only: [ :index, :create, :destroy ]
 
+  resources :events do
+    member do
+      post :check_in
+    end
+  end
+
+  scope "o/:org_slug", module: :public, as: :public do
+    resources :events, only: [ :index, :show ] do
+      member do
+        post :rsvp
+      end
+    end
+  end
+
   namespace :webhooks do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"

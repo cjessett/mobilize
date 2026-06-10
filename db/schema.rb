@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -154,6 +154,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
     t.index ["person_id"], name: "index_email_deliveries_on_person_id"
   end
 
+  create_table "events", force: :cascade do |t|
+    t.integer "access_scope_id", null: false
+    t.string "access_scope_type", null: false
+    t.integer "capacity"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "ends_at"
+    t.integer "host_id"
+    t.string "location"
+    t.integer "organization_id", null: false
+    t.datetime "starts_at", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "virtual_url"
+    t.index ["access_scope_type", "access_scope_id"], name: "index_events_on_access_scope"
+    t.index ["host_id"], name: "index_events_on_host_id"
+    t.index ["organization_id"], name: "index_events_on_organization_id"
+  end
+
   create_table "keywords", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id", null: false
@@ -242,6 +261,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
     t.index ["organization_id", "email"], name: "index_people_on_organization_id_and_email"
     t.index ["organization_id", "phone"], name: "index_people_on_organization_id_and_phone", unique: true, where: "phone IS NOT NULL"
     t.index ["organization_id"], name: "index_people_on_organization_id"
+  end
+
+  create_table "rsvps", force: :cascade do |t|
+    t.boolean "attended", default: false, null: false
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "person_id", null: false
+    t.string "status", default: "yes", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "person_id"], name: "index_rsvps_on_event_id_and_person_id", unique: true
+    t.index ["event_id"], name: "index_rsvps_on_event_id"
+    t.index ["person_id"], name: "index_rsvps_on_person_id"
   end
 
   create_table "segments", force: :cascade do |t|
@@ -357,6 +388,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
   add_foreign_key "email_blasts", "segments"
   add_foreign_key "email_deliveries", "email_blasts"
   add_foreign_key "email_deliveries", "people"
+  add_foreign_key "events", "organizations"
+  add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "keywords", "organizations"
   add_foreign_key "keywords", "tags"
   add_foreign_key "memberships", "organizations"
@@ -369,6 +402,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
   add_foreign_key "notes", "users"
   add_foreign_key "organizations", "organizations", column: "parent_id"
   add_foreign_key "people", "organizations"
+  add_foreign_key "rsvps", "events"
+  add_foreign_key "rsvps", "people"
   add_foreign_key "segments", "organizations"
   add_foreign_key "sessions", "users"
   add_foreign_key "sms_templates", "organizations"
