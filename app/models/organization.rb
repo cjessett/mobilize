@@ -8,6 +8,18 @@ class Organization < ApplicationRecord
   has_many :custom_fields, dependent: :destroy
   has_many :tags, dependent: :destroy
   has_many :segments, dependent: :destroy
+  has_many :messages, dependent: :destroy
+  has_many :blasts, dependent: :destroy
+  has_many :sms_templates, dependent: :destroy
+  has_many :keywords, dependent: :destroy
+
+  def chapter_for_phone_number(number)
+    chapters.find_by(phone_number: PhoneNumber.normalize(number))
+  end
+
+  def self.for_inbound_number(number)
+    Chapter.find_by(phone_number: PhoneNumber.normalize(number))&.organization
+  end
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }

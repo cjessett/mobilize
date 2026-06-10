@@ -14,6 +14,26 @@ Rails.application.routes.draw do
   end
   resources :segments
 
+  resources :conversations, only: [ :index, :show ], path: "inbox" do
+    member do
+      post :reply
+    end
+  end
+  resources :blasts do
+    member do
+      post :send_now
+      post :schedule
+      post :cancel
+    end
+  end
+  resources :sms_templates, except: :show
+  resources :keywords, only: [ :index, :create, :destroy ]
+
+  namespace :webhooks do
+    post "twilio/inbound_sms", to: "twilio#inbound_sms"
+    post "twilio/sms_status", to: "twilio#sms_status"
+  end
+
   namespace :settings do
     resource :organization, only: [ :show, :update ]
     resources :chapters

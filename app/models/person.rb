@@ -7,6 +7,7 @@ class Person < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :notes, dependent: :destroy
   has_many :activities, dependent: :destroy
+  has_many :messages, dependent: :destroy
 
   scope :visible_to, ->(membership) {
     scope = where(organization: membership.organization)

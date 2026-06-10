@@ -1,0 +1,6 @@
+<div class="<%= message.direction == 'inbound' ? 'self-start bg-gray-100 text-gray-900' : 'self-end bg-blue-600 text-white' %> rounded-2xl px-4 py-2 max-w-[75%]">
+  <div class="text-sm whitespace-pre-wrap"><%= message.body %></div>
+  <div class="text-[10px] mt-1 <%= message.direction == 'inbound' ? 'text-gray-400' : 'text-blue-100' %>">
+    <%= message.created_at.strftime("%b %-d %l:%M %p") %><%= " · #{message.status}" if message.direction == "outbound" %>
+  </div>
+</div>

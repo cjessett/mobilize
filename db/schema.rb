@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_020000) do
   create_table "activities", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.json "data", default: {}, null: false
@@ -25,6 +25,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
     t.index ["person_id", "occurred_at"], name: "index_activities_on_person_id_and_occurred_at"
     t.index ["person_id"], name: "index_activities_on_person_id"
     t.index ["subject_type", "subject_id"], name: "index_activities_on_subject"
+  end
+
+  create_table "blasts", force: :cascade do |t|
+    t.integer "access_scope_id", null: false
+    t.string "access_scope_type", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.datetime "scheduled_at"
+    t.integer "segment_id"
+    t.datetime "sent_at"
+    t.string "status", default: "draft", null: false
+    t.datetime "updated_at", null: false
+    t.index ["access_scope_type", "access_scope_id"], name: "index_blasts_on_access_scope"
+    t.index ["organization_id"], name: "index_blasts_on_organization_id"
+    t.index ["segment_id"], name: "index_blasts_on_segment_id"
   end
 
   create_table "chapter_memberships", force: :cascade do |t|
@@ -69,6 +86,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
     t.index ["organization_id"], name: "index_custom_fields_on_organization_id"
   end
 
+  create_table "keywords", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "organization_id", null: false
+    t.text "reply_body"
+    t.integer "tag_id"
+    t.datetime "updated_at", null: false
+    t.string "word", null: false
+    t.index ["organization_id", "word"], name: "index_keywords_on_organization_id_and_word", unique: true
+    t.index ["organization_id"], name: "index_keywords_on_organization_id"
+    t.index ["tag_id"], name: "index_keywords_on_tag_id"
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.integer "access_scope_id", null: false
     t.string "access_scope_type", null: false
@@ -81,6 +110,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
     t.index ["organization_id"], name: "index_memberships_on_organization_id"
     t.index ["user_id", "organization_id"], name: "index_memberships_on_user_id_and_organization_id", unique: true
     t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "blast_id"
+    t.text "body", null: false
+    t.integer "chapter_id"
+    t.datetime "created_at", null: false
+    t.string "direction", null: false
+    t.string "error_message"
+    t.integer "organization_id", null: false
+    t.integer "person_id", null: false
+    t.string "provider_sid"
+    t.datetime "sent_at"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blast_id"], name: "index_messages_on_blast_id"
+    t.index ["chapter_id"], name: "index_messages_on_chapter_id"
+    t.index ["organization_id"], name: "index_messages_on_organization_id"
+    t.index ["person_id", "created_at"], name: "index_messages_on_person_id_and_created_at"
+    t.index ["person_id"], name: "index_messages_on_person_id"
+    t.index ["provider_sid"], name: "index_messages_on_provider_sid"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -147,6 +197,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "sms_templates", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_sms_templates_on_organization_id"
+  end
+
   create_table "taggings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "person_id", null: false
@@ -178,19 +237,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_010000) do
 
   add_foreign_key "activities", "organizations"
   add_foreign_key "activities", "people"
+  add_foreign_key "blasts", "organizations"
+  add_foreign_key "blasts", "segments"
   add_foreign_key "chapter_memberships", "chapters"
   add_foreign_key "chapter_memberships", "people"
   add_foreign_key "chapter_zip_codes", "chapters"
   add_foreign_key "chapters", "organizations"
   add_foreign_key "custom_fields", "organizations"
+  add_foreign_key "keywords", "organizations"
+  add_foreign_key "keywords", "tags"
   add_foreign_key "memberships", "organizations"
   add_foreign_key "memberships", "users"
+  add_foreign_key "messages", "blasts"
+  add_foreign_key "messages", "chapters"
+  add_foreign_key "messages", "organizations"
+  add_foreign_key "messages", "people"
   add_foreign_key "notes", "people"
   add_foreign_key "notes", "users"
   add_foreign_key "organizations", "organizations", column: "parent_id"
   add_foreign_key "people", "organizations"
   add_foreign_key "segments", "organizations"
   add_foreign_key "sessions", "users"
+  add_foreign_key "sms_templates", "organizations"
   add_foreign_key "taggings", "people"
   add_foreign_key "taggings", "tags"
   add_foreign_key "tags", "organizations"

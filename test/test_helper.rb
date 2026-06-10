@@ -11,6 +11,11 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    include ActiveJob::TestHelper
+
+    # Each test gets a fresh fake SMS provider so deliveries can be asserted.
+    setup { Rails.application.config.x.sms_provider = Sms::FakeProvider.new }
+
+    def fake_sms = Sms.provider
   end
 end

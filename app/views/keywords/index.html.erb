@@ -1,0 +1,41 @@
+<%= render "shared/flash" %>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <h1 class="font-bold text-3xl mb-2">Keywords</h1>
+  <p class="text-gray-500 text-sm mb-4">When someone texts a chapter number starting with a keyword, they're tagged and optionally get an auto-reply. STOP/START opt-out keywords are always handled automatically.</p>
+
+  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100 mb-6">
+    <% if @keywords.empty? %>
+      <p class="p-4 text-gray-500 text-sm">No keywords yet.</p>
+    <% end %>
+    <% @keywords.each do |keyword| %>
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <span class="font-mono font-medium uppercase"><%= keyword.word %></span>
+          <% if keyword.tag %><span class="text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 ml-2">tags: <%= keyword.tag.name %></span><% end %>
+          <% if keyword.reply_body.present? %><div class="text-sm text-gray-500 mt-1">↩ <%= keyword.reply_body.truncate(100) %></div><% end %>
+        </div>
+        <%= button_to "Remove", keyword_path(keyword), method: :delete, data: { turbo_confirm: "Remove this keyword?" }, class: "text-sm text-red-600 hover:underline cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <h2 class="font-semibold text-lg mb-2">Add keyword</h2>
+  <%= form_with model: @keyword, url: keywords_path, class: "contents" do |form| %>
+    <div class="flex gap-2 items-end flex-wrap">
+      <div>
+        <%= form.label :word, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :word, required: true, placeholder: "JOIN", class: "block shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white w-32" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Apply tag</label>
+        <%= text_field_tag "keyword[tag_name]", nil, placeholder: "member", class: "block shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white w-40" %>
+      </div>
+      <div class="flex-1 min-w-64">
+        <%= form.label :reply_body, "Auto-reply (optional)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :reply_body, placeholder: "Thanks for joining {{first_name}}!", class: "block shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white w-full" %>
+      </div>
+      <%= form.submit "Add", class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium cursor-pointer" %>
+    </div>
+  <% end %>
+</div>
