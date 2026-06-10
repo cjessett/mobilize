@@ -42,7 +42,7 @@ module ApplicationHelper
     else
       "border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"
     end
-    link_to label, path, class: "px-1 pb-3 -mb-px border-b-2 text-lg #{classes}"
+    link_to label, path, class: "px-1 pb-3 -mb-px border-b-2 text-base md:text-lg whitespace-nowrap shrink-0 #{classes}"
   end
 
   def status_pill(label, tone = :gray)

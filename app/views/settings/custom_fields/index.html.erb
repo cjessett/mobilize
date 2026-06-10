@@ -37,7 +37,7 @@
   </div>
 
   <%= form_with model: @custom_field, url: settings_custom_fields_path, class: "contents" do |form| %>
-    <div class="border-t border-gray-200 dark:border-slate-700/70 px-6 py-5 flex gap-3 items-end">
+    <div class="border-t border-gray-200 dark:border-slate-700/70 px-4 md:px-6 py-5 flex flex-wrap gap-3 items-end">
       <div class="flex-1 max-w-xs">
         <label class="block text-xs font-semibold tracking-widest uppercase text-gray-400 dark:text-slate-500 mb-2">Label</label>
         <%= form.text_field :label, required: true, class: ui_input %>

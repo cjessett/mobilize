@@ -6,7 +6,7 @@
 </div>
 
 <div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
-  <div class="flex gap-8 px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70">
+  <div class="flex gap-6 md:gap-8 px-4 md:px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70 overflow-x-auto">
     <%= tab_link "Active & Upcoming Events", events_path, active: @tab == "upcoming" %>
     <%= tab_link "Past Events", events_path(tab: "past"), active: @tab == "past" %>
   </div>

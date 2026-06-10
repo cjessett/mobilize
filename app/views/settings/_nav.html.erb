@@ -1,4 +1,4 @@
-<div class="flex gap-8 px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70">
+<div class="flex gap-6 md:gap-8 px-4 md:px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70 overflow-x-auto">
   <%= tab_link "Organization", settings_organization_path, active: controller_name == "organizations" %>
   <%= tab_link "Chapters", settings_chapters_path, active: controller_name == "chapters" %>
   <%= tab_link "Members", settings_members_path, active: controller_name == "members" %>
