@@ -1,6 +1,6 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
   <h1 class="font-bold text-3xl text-gray-900 dark:text-white">All Events</h1>
   <%= link_to "Create New Event", new_event_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
@@ -11,7 +11,9 @@
     <%= tab_link "Past Events", events_path(tab: "past"), active: @tab == "past" %>
   </div>
 
-  <table class="w-full text-left">
+  <div class="overflow-x-auto">
+
+  <table class="w-full text-left min-w-[40rem]">
     <thead>
       <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
         <th class="px-6 py-4 font-semibold">Title</th>
@@ -46,4 +48,5 @@
       <% end %>
     </tbody>
   </table>
+  </div>
 </div>

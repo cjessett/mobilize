@@ -1,6 +1,6 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
   <h1 class="font-bold text-3xl"><%= @organization.name %></h1>
   <%= form_with url: root_path, method: :get, class: "flex gap-2" do |form| %>
     <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + @chapters.map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm", onchange: "this.form.requestSubmit()" } %>

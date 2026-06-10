@@ -25,31 +25,40 @@
 
   <body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-slate-200 min-h-screen">
     <% if authenticated? %>
-      <header class="bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-20">
-        <div class="flex items-center gap-6 h-16 px-5">
-          <%= link_to root_path, class: "flex items-center gap-3 min-w-56" do %>
-            <span class="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm"><%= current_organization&.name&.first %></span>
+      <div data-controller="sidebar">
+      <header class="bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-40">
+        <div class="flex items-center gap-3 md:gap-6 h-16 px-4 md:px-5">
+          <button type="button" data-action="sidebar#toggle" class="md:hidden text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white cursor-pointer" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+          </button>
+          <%= link_to root_path, class: "flex items-center gap-3 min-w-0 md:min-w-56" do %>
+            <span class="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0"><%= current_organization&.name&.first %></span>
             <span class="font-semibold text-gray-900 dark:text-white truncate"><%= current_organization&.name %></span>
           <% end %>
-          <%= form_with url: people_path, method: :get, class: "flex-1 max-w-2xl" do |form| %>
+          <%= form_with url: people_path, method: :get, class: "flex-1 max-w-2xl hidden sm:block" do |form| %>
             <div class="relative">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
               <%= form.text_field :q, placeholder: "Search anything", class: "w-full rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 pl-10 pr-4 py-2 text-sm text-gray-800 dark:text-slate-200 focus:outline-indigo-500" %>
             </div>
           <% end %>
-          <div class="ml-auto flex items-center gap-4">
+          <div class="ml-auto flex items-center gap-3 md:gap-4 shrink-0">
             <%# data-turbo=false: the theme class lives on <html>, which Turbo doesn't swap %>
             <%= button_to theme_path(theme: current_theme == "dark" ? "light" : "dark"), method: :patch, form: { data: { turbo: false } }, class: "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white cursor-pointer", title: "Switch to #{current_theme == 'dark' ? 'light' : 'dark'} theme" do %>
               <%= sidebar_icon(current_theme == "dark" ? :sun : :moon) %>
             <% end %>
-            <span class="text-sm text-gray-900 dark:text-white font-medium"><%= Current.user&.name %></span>
+            <span class="text-sm text-gray-900 dark:text-white font-medium hidden md:block"><%= Current.user&.name %></span>
             <%= button_to "Sign out", session_path, method: :delete, class: "text-sm text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" %>
           </div>
         </div>
       </header>
 
+      <div data-sidebar-target="backdrop" data-action="click->sidebar#close" class="hidden fixed inset-0 bg-black/50 z-40 md:hidden"></div>
+
       <div class="flex">
-        <nav class="w-60 shrink-0 bg-white dark:bg-slate-950 border-r border-gray-200 dark:border-slate-800 min-h-[calc(100vh-4rem)] py-4 sticky top-16 self-start hidden md:block">
+        <nav data-sidebar-target="menu" data-action="click->sidebar#close"
+             class="w-60 shrink-0 bg-white dark:bg-slate-950 border-r border-gray-200 dark:border-slate-800 py-4 overflow-y-auto
+                    fixed inset-y-0 left-0 z-50 -translate-x-full transition-transform duration-200
+                    md:translate-x-0 md:static md:z-auto md:sticky md:top-16 md:self-start md:min-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-4rem)] md:inset-auto">
           <%= sidebar_link "People", people_path, icon: :people, active: controller_name == "people" %>
           <div class="mb-2">
             <%= sidebar_sublink "All People", people_path, active: controller_name == "people" && action_name != "import" %>
@@ -83,9 +92,10 @@
           </div>
         </nav>
 
-        <main class="flex-1 min-w-0 p-8">
+        <main class="flex-1 min-w-0 p-4 md:p-8">
           <%= yield %>
         </main>
+      </div>
       </div>
     <% else %>
       <main class="container mx-auto mt-24 px-5">

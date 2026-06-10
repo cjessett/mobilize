@@ -1,12 +1,13 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
   <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Lists</h1>
   <%= link_to "Create New List", new_segment_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
 <div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
-  <table class="w-full text-left">
+  <div class="overflow-x-auto">
+  <table class="w-full text-left min-w-[40rem]">
     <thead>
       <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
         <th class="px-6 py-4 font-semibold">Name</th>
@@ -29,4 +30,5 @@
       <% end %>
     </tbody>
   </table>
+  </div>
 </div>

@@ -10,13 +10,15 @@
 <p class="text-gray-500 dark:text-slate-400 italic mb-5"><%= @people.size %> results</p>
 
 <div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
-  <%= form_with url: people_path, method: :get, class: "flex gap-2 p-4 border-b border-gray-200 dark:border-slate-700/70" do |form| %>
+  <%= form_with url: people_path, method: :get, class: "flex flex-wrap gap-2 p-4 border-b border-gray-200 dark:border-slate-700/70" do |form| %>
     <%= form.text_field :q, value: params[:q], placeholder: "Filter by name, phone, email", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 w-72 bg-white dark:bg-slate-900 text-sm" %>
     <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + current_membership.accessible_chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-900 text-sm" } %>
     <%= form.submit "Filter", class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
   <% end %>
 
-  <table class="w-full text-left">
+  <div class="overflow-x-auto">
+
+  <table class="w-full text-left min-w-[40rem]">
     <thead>
       <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
         <th class="px-4 py-3 font-semibold">Name</th>
@@ -63,4 +65,5 @@
       <% end %>
     </tbody>
   </table>
+  </div>
 </div>

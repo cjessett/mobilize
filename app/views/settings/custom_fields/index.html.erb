@@ -5,7 +5,9 @@
 <div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
   <%= render "settings/nav" %>
 
-  <table class="w-full text-left">
+  <div class="overflow-x-auto">
+
+  <table class="w-full text-left min-w-[40rem]">
     <thead>
       <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
         <th class="px-6 py-4 font-semibold">Property</th>
@@ -32,6 +34,7 @@
       <% end %>
     </tbody>
   </table>
+  </div>
 
   <%= form_with model: @custom_field, url: settings_custom_fields_path, class: "contents" do |form| %>
     <div class="border-t border-gray-200 dark:border-slate-700/70 px-6 py-5 flex gap-3 items-end">
