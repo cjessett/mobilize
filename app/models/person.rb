@@ -8,6 +8,9 @@ class Person < ApplicationRecord
   has_many :notes, dependent: :destroy
   has_many :activities, dependent: :destroy
   has_many :messages, dependent: :destroy
+  has_many :email_deliveries, dependent: :destroy
+
+  generates_token_for :unsubscribe
 
   scope :visible_to, ->(membership) {
     scope = where(organization: membership.organization)

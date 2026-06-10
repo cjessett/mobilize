@@ -1,0 +1,46 @@
+<%= render "shared/flash" %>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <div class="flex items-center justify-between mb-2">
+    <h1 class="font-bold text-3xl"><%= @email_blast.name %></h1>
+    <span class="text-sm rounded-full px-3 py-1 <%= { 'draft' => 'bg-gray-100 text-gray-600', 'scheduled' => 'bg-yellow-50 text-yellow-700', 'sending' => 'bg-blue-50 text-blue-700', 'sent' => 'bg-green-50 text-green-700', 'failed' => 'bg-red-50 text-red-600', 'canceled' => 'bg-gray-100 text-gray-400' }[@email_blast.status] %>"><%= @email_blast.status %></span>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+    <div class="font-medium mb-2">Subject: <%= @email_blast.subject %></div>
+    <div class="prose prose-sm max-w-none"><%= @email_blast.body %></div>
+    <div class="text-xs text-gray-400 mt-3">
+      Audience: <%= @email_blast.segment&.name || "Everyone" %>
+      · Scope: <%= @email_blast.org_scoped? ? "Organization-wide" : @email_blast.chapter.name %>
+      · <%= pluralize(@recipient_count, @email_blast.editable? ? "recipient" : "delivery") %>
+    </div>
+  </div>
+
+  <% if @stats.present? %>
+    <div class="flex gap-3 mb-4">
+      <% @stats.each do |status, count| %>
+        <div class="bg-white rounded-lg border border-gray-200 px-4 py-2 text-center">
+          <div class="text-lg font-bold"><%= count %></div>
+          <div class="text-xs text-gray-500"><%= status %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @email_blast.editable? %>
+    <div class="flex gap-2 items-end flex-wrap">
+      <%= button_to "Send now", send_now_email_blast_path(@email_blast), method: :post, data: { turbo_confirm: "Send to #{@recipient_count} people now?" }, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+      <%= form_with url: schedule_email_blast_path(@email_blast), method: :post, class: "flex gap-2 items-end" do |form| %>
+        <div>
+          <label class="block text-xs text-gray-500">Schedule for (<%= current_organization.time_zone %>)</label>
+          <%= form.datetime_local_field :scheduled_at, class: "shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white" %>
+        </div>
+        <%= form.submit "Schedule", class: "rounded-md px-3.5 py-2.5 border border-gray-300 bg-white hover:bg-gray-100 font-medium cursor-pointer" %>
+      <% end %>
+      <% if @email_blast.scheduled? %>
+        <%= button_to "Cancel schedule", cancel_email_blast_path(@email_blast), method: :post, class: "rounded-md px-3.5 py-2.5 border border-red-200 text-red-600 bg-white hover:bg-red-50 font-medium cursor-pointer" %>
+      <% end %>
+      <%= link_to "Edit", edit_email_blast_path(@email_blast), class: "rounded-md px-3.5 py-2.5 border border-gray-300 bg-white hover:bg-gray-100 font-medium" %>
+    </div>
+  <% end %>
+</div>

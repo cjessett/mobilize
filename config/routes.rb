@@ -27,6 +27,15 @@ Rails.application.routes.draw do
     end
   end
   resources :sms_templates, except: :show
+  resources :email_blasts do
+    member do
+      post :send_now
+      post :schedule
+      post :cancel
+    end
+  end
+  get "unsubscribe/:token", to: "email_tracking#unsubscribe", as: :unsubscribe
+  get "email/open/:token", to: "email_tracking#open", as: :email_open
   resources :keywords, only: [ :index, :create, :destroy ]
 
   namespace :webhooks do

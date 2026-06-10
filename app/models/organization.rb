@@ -12,6 +12,7 @@ class Organization < ApplicationRecord
   has_many :blasts, dependent: :destroy
   has_many :sms_templates, dependent: :destroy
   has_many :keywords, dependent: :destroy
+  has_many :email_blasts, dependent: :destroy
 
   def chapter_for_phone_number(number)
     chapters.find_by(phone_number: PhoneNumber.normalize(number))
