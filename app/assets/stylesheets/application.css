@@ -8,3 +8,8 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Trix toolbar buttons wrap on narrow screens instead of widening the page */
+trix-toolbar .trix-button-row {
+  flex-wrap: wrap;
+}

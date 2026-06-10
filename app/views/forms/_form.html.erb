@@ -53,7 +53,7 @@
       <div class="rounded-md border border-gray-200 dark:border-slate-700 divide-y divide-gray-100 dark:divide-slate-700/60">
         <% Form::BUILTIN_FIELDS.merge(current_organization.custom_fields.pluck(:key, :label).to_h).each do |key, default_label| %>
           <% field = existing[key] %>
-          <div class="p-3 flex items-center gap-4">
+          <div class="p-3 flex flex-wrap items-center gap-3 md:gap-4">
             <label class="flex items-center gap-2 w-40 text-sm cursor-pointer">
               <%= check_box_tag "form[fields][#{key}][include]", "1", field.present? || (form.new_record? && Form::BUILTIN_FIELDS.key?(key)), class: "accent-indigo-500" %>
               <span class="font-medium text-gray-900 dark:text-white"><%= default_label %></span>

@@ -1,4 +1,4 @@
-<div data-condition-row class="flex gap-2 items-center bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/70 rounded-md p-2">
+<div data-condition-row class="flex flex-wrap gap-2 items-center bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/70 rounded-md p-2">
   <%= select_tag "segment[conditions][][type]",
         options_for_select([ [ "Field", "field" ], [ "Custom field", "custom_field" ], [ "Tag", "tag" ], [ "Chapter", "chapter" ] ], condition["type"]),
         data: { role: "type", action: "conditions#typeChanged" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>

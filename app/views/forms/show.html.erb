@@ -1,10 +1,10 @@
 <%= render "shared/flash" %>
 
-<div class="flex items-start justify-between mb-4">
+<div class="flex flex-wrap items-start justify-between gap-3 mb-4">
   <div>
     <h1 class="font-bold text-3xl"><%= @form.title %> <span class="text-sm font-normal bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full px-2 py-0.5 align-middle"><%= @form.kind %></span></h1>
     <div class="text-sm text-gray-400 dark:text-slate-500 mt-1">
-      Public page: <%= link_to public_form_url(current_organization.slug, @form.slug), public_form_url(current_organization.slug, @form.slug), class: "text-indigo-600 dark:text-indigo-400 hover:underline" %>
+      Public page: <%= link_to public_form_url(current_organization.slug, @form.slug), public_form_url(current_organization.slug, @form.slug), class: "text-indigo-600 dark:text-indigo-400 hover:underline break-all" %>
     </div>
   </div>
   <div class="flex gap-2">

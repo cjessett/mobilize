@@ -24,10 +24,10 @@ module ApplicationHelper
   # A form row with an uppercase label column on the left and the control
   # (plus optional hint) on the right.
   def form_row(label, hint: nil, &block)
-    tag.div(class: "grid md:grid-cols-[13rem_1fr] gap-2 md:gap-10 px-6 py-6 items-start") do
+    tag.div(class: "grid md:grid-cols-[13rem_minmax(0,1fr)] gap-2 md:gap-10 px-4 md:px-6 py-6 items-start") do
       tag.span(label.upcase, class: "text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 md:pt-3") +
-        tag.div(class: "max-w-2xl") do
-          capture(&block) + (hint.present? ? tag.p(hint, class: "text-sm text-gray-400 dark:text-slate-500 mt-2") : "".html_safe)
+        tag.div(class: "max-w-2xl min-w-0") do
+          capture(&block) + (hint.present? ? tag.p(hint, class: "text-sm text-gray-400 dark:text-slate-500 mt-2 break-words") : "".html_safe)
         end
     end
   end
