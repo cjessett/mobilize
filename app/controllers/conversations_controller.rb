@@ -1,11 +1,7 @@
 class ConversationsController < ApplicationController
+  before_action :load_conversations, only: [ :index, :show ]
+
   def index
-    visible_people = Person.visible_to(current_membership)
-    latest = Message.where(person_id: visible_people.select(:id)).group(:person_id).maximum(:created_at)
-    @conversations = latest.sort_by { |_, at| at }.reverse.first(100).map do |person_id, at|
-      person = Person.find(person_id)
-      [ person, person.messages.order(created_at: :desc).first, at ]
-    end
   end
 
   def show
@@ -23,6 +19,17 @@ class ConversationsController < ApplicationController
     else
       Message.compose!(person: person, body: body).deliver_later
       redirect_to conversation_path(person)
+    end
+  end
+
+  private
+
+  def load_conversations
+    visible_people = Person.visible_to(current_membership)
+    latest = Message.where(person_id: visible_people.select(:id)).group(:person_id).maximum(:created_at)
+    @conversations = latest.sort_by { |_, at| at }.reverse.first(100).map do |person_id, at|
+      person = Person.find(person_id)
+      [ person, person.messages.order(created_at: :desc).first, at ]
     end
   end
 end

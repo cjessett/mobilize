@@ -1,6 +1,16 @@
-<div class="<%= message.direction == 'inbound' ? 'self-start bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-slate-100' : 'self-end bg-indigo-600 text-white' %> rounded-2xl px-4 py-2 max-w-[75%]">
+<div class="<%= message.direction == 'inbound' ? 'self-start bg-gray-100 text-gray-900 dark:bg-slate-700/80 dark:text-slate-100 rounded-2xl rounded-bl-sm' : 'self-end bg-indigo-500 text-white rounded-2xl rounded-br-sm' %> px-4 py-2.5 max-w-[70%]">
   <div class="text-sm whitespace-pre-wrap"><%= message.body %></div>
-  <div class="text-[10px] mt-1 <%= message.direction == 'inbound' ? 'text-gray-400 dark:text-slate-500' : 'text-indigo-200' %>">
-    <%= message.created_at.strftime("%b %-d %l:%M %p") %><%= " · #{message.status}" if message.direction == "outbound" %>
+  <div class="flex items-center gap-1.5 text-[11px] mt-1 <%= message.direction == 'inbound' ? 'text-gray-400 dark:text-slate-400' : 'text-indigo-100' %>">
+    <span><%= message.created_at.in_time_zone(message.organization.time_zone).strftime("%-l:%M %p") %></span>
+    <% if message.direction == "outbound" %>
+      <% case message.status %>
+      <% when "delivered" %>
+        <span title="Delivered">✓✓</span>
+      <% when "sent", "queued" %>
+        <span title="Sent">✓</span>
+      <% when "failed" %>
+        <span class="text-red-200" title="<%= message.error_message %>">failed</span>
+      <% end %>
+    <% end %>
   </div>
 </div>

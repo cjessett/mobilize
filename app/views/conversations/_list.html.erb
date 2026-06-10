@@ -1,0 +1,29 @@
+<div class="w-96 shrink-0 border-r border-gray-200 dark:border-slate-700/70 flex flex-col">
+  <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700/70">
+    <div class="rounded-md border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 px-3 py-2 text-sm text-gray-500 dark:text-slate-400">All Messages</div>
+  </div>
+  <div class="flex-1 overflow-y-auto divide-y divide-gray-200 dark:divide-slate-700/60">
+    <% if @conversations.empty? %>
+      <p class="p-6 text-gray-500 dark:text-slate-400 text-sm">No conversations yet. Send someone a text from their profile or a blast.</p>
+    <% end %>
+    <% @conversations.each do |person, last_message, at| %>
+      <% active = defined?(active_person) && active_person == person %>
+      <%= link_to conversation_path(person), class: "block p-4 #{active ? 'bg-gray-100 dark:bg-slate-800' : 'hover:bg-gray-50 dark:hover:bg-slate-800/60'}" do %>
+        <div class="flex items-start gap-3">
+          <span class="h-10 w-10 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 flex items-center justify-center text-xs font-semibold uppercase shrink-0">
+            <%= person.name.split.map(&:first).first(2).join %>
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="font-medium text-gray-900 dark:text-white truncate"><%= person.name %></span>
+              <span class="text-xs text-gray-400 dark:text-slate-500 shrink-0"><%= at.in_time_zone(current_organization.time_zone).strftime("%a %-l:%M%P") %></span>
+            </div>
+            <div class="text-sm text-gray-500 dark:text-slate-400 line-clamp-2 mt-0.5">
+              <%= last_message.body.truncate(110) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
