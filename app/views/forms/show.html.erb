@@ -1,0 +1,39 @@
+<%= render "shared/flash" %>
+
+<div class="flex items-start justify-between mb-4">
+  <div>
+    <h1 class="font-bold text-3xl"><%= @form.title %> <span class="text-sm font-normal bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 align-middle"><%= @form.kind %></span></h1>
+    <div class="text-sm text-gray-400 mt-1">
+      Public page: <%= link_to public_form_url(current_organization.slug, @form.slug), public_form_url(current_organization.slug, @form.slug), class: "text-blue-700 hover:underline" %>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_form_path(@form), class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium" %>
+    <%= button_to "Delete", @form, method: :delete, data: { turbo_confirm: "Delete this form?" }, class: "rounded-md px-3.5 py-2 border border-red-200 text-red-600 bg-white hover:bg-red-50 text-sm font-medium cursor-pointer" %>
+  </div>
+</div>
+
+<% if @form.petition? && @form.goal %>
+  <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+    <div class="flex justify-between text-sm mb-1">
+      <span class="font-medium"><%= @form.signature_count %> signatures</span>
+      <span class="text-gray-500">Goal: <%= @form.goal %></span>
+    </div>
+    <div class="bg-gray-100 rounded-full h-2">
+      <div class="bg-blue-600 rounded-full h-2" style="width: <%= [ (@form.signature_count * 100.0 / @form.goal), 100 ].min.round %>%"></div>
+    </div>
+  </div>
+<% end %>
+
+<h2 class="font-semibold text-lg mb-2"><%= @form.petition? ? "Signatures" : "Submissions" %> (<%= @form.signature_count %>)</h2>
+<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+  <% if @submissions.empty? %>
+    <p class="p-4 text-gray-500 text-sm">Nothing yet. Share the public link above.</p>
+  <% end %>
+  <% @submissions.each do |submission| %>
+    <div class="p-4 flex items-center justify-between">
+      <%= link_to submission.person.name, submission.person, class: "font-medium text-blue-700 hover:underline" %>
+      <span class="text-xs text-gray-400"><%= time_ago_in_words(submission.created_at) %> ago</span>
+    </div>
+  <% end %>
+</div>

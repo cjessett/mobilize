@@ -1,0 +1,26 @@
+<%= render "shared/flash" %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="font-bold text-3xl">Forms & petitions</h1>
+  <div class="flex gap-2">
+    <%= link_to "New petition", new_form_path(kind: "petition"), class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium" %>
+    <%= link_to "New signup form", new_form_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+  <% if @forms.empty? %>
+    <p class="p-6 text-gray-500">No forms yet. Signup forms and petitions collect people straight into your CRM.</p>
+  <% end %>
+  <% @forms.each do |form| %>
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <%= link_to form.title, form, class: "font-medium text-blue-700 hover:underline" %>
+        <span class="text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5 ml-2"><%= form.kind %></span>
+      </div>
+      <span class="text-sm text-gray-400">
+        <%= form.signature_count %> <%= form.petition? ? "signatures" : "submissions" %><%= " / #{form.goal} goal" if form.goal %>
+      </span>
+    </div>
+  <% end %>
+</div>

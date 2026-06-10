@@ -15,6 +15,7 @@ class Organization < ApplicationRecord
   has_many :email_blasts, dependent: :destroy
   has_many :workflows, dependent: :destroy
   has_many :events, dependent: :destroy
+  has_many :forms, dependent: :destroy
 
   def chapter_for_phone_number(number)
     chapters.find_by(phone_number: PhoneNumber.normalize(number))

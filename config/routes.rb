@@ -49,12 +49,16 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :forms
+
   scope "o/:org_slug", module: :public, as: :public do
     resources :events, only: [ :index, :show ] do
       member do
         post :rsvp
       end
     end
+    get "f/:slug", to: "forms#show", as: :form
+    post "f/:slug", to: "forms#submit", as: :submit_form
   end
 
   namespace :webhooks do

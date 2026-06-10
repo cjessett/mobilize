@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_060000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -173,6 +173,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
     t.index ["organization_id"], name: "index_events_on_organization_id"
   end
 
+  create_table "form_fields", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "form_id", null: false
+    t.string "key", null: false
+    t.string "label", null: false
+    t.integer "position", null: false
+    t.boolean "required", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_id", "key"], name: "index_form_fields_on_form_id_and_key", unique: true
+    t.index ["form_id"], name: "index_form_fields_on_form_id"
+  end
+
+  create_table "forms", force: :cascade do |t|
+    t.integer "access_scope_id", null: false
+    t.string "access_scope_type", null: false
+    t.integer "apply_tag_id"
+    t.string "confirmation_message"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "goal"
+    t.string "kind", default: "signup", null: false
+    t.integer "organization_id", null: false
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["access_scope_type", "access_scope_id"], name: "index_forms_on_access_scope"
+    t.index ["apply_tag_id"], name: "index_forms_on_apply_tag_id"
+    t.index ["organization_id", "slug"], name: "index_forms_on_organization_id_and_slug", unique: true
+    t.index ["organization_id"], name: "index_forms_on_organization_id"
+  end
+
   create_table "keywords", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organization_id", null: false
@@ -305,6 +336,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
     t.index ["organization_id"], name: "index_sms_templates_on_organization_id"
   end
 
+  create_table "submissions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.json "data", default: {}, null: false
+    t.integer "form_id", null: false
+    t.integer "person_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_id"], name: "index_submissions_on_form_id"
+    t.index ["person_id"], name: "index_submissions_on_person_id"
+  end
+
   create_table "taggings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "person_id", null: false
@@ -390,6 +431,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
   add_foreign_key "email_deliveries", "people"
   add_foreign_key "events", "organizations"
   add_foreign_key "events", "users", column: "host_id"
+  add_foreign_key "form_fields", "forms"
+  add_foreign_key "forms", "organizations"
+  add_foreign_key "forms", "tags", column: "apply_tag_id"
   add_foreign_key "keywords", "organizations"
   add_foreign_key "keywords", "tags"
   add_foreign_key "memberships", "organizations"
@@ -407,6 +451,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_050000) do
   add_foreign_key "segments", "organizations"
   add_foreign_key "sessions", "users"
   add_foreign_key "sms_templates", "organizations"
+  add_foreign_key "submissions", "forms"
+  add_foreign_key "submissions", "people"
   add_foreign_key "taggings", "people"
   add_foreign_key "taggings", "tags"
   add_foreign_key "tags", "organizations"
