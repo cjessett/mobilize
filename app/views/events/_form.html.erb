@@ -25,11 +25,11 @@
     <% end %>
 
     <%= form_row "Begins at", hint: "Shown in #{current_organization.time_zone}." do %>
-      <%= form.datetime_local_field :starts_at, required: true, value: event.starts_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: ui_input %>
+      <%= form.text_field :starts_at, required: true, placeholder: "Select time", value: event.starts_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%d %H:%M"), data: { controller: "datepicker" }, class: ui_input %>
     <% end %>
 
     <%= form_row "Ends at" do %>
-      <%= form.datetime_local_field :ends_at, value: event.ends_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: ui_input %>
+      <%= form.text_field :ends_at, placeholder: "Select time", value: event.ends_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%d %H:%M"), data: { controller: "datepicker" }, class: ui_input %>
     <% end %>
 
     <%= form_row "Location", hint: "Street address for in-person and hybrid events." do %>

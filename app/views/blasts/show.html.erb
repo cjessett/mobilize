@@ -33,7 +33,7 @@
       <%= form_with url: schedule_blast_path(@blast), method: :post, class: "flex gap-2 items-end" do |form| %>
         <div>
           <label class="block text-xs text-gray-500 dark:text-slate-400">Schedule for (<%= current_organization.time_zone %>)</label>
-          <%= form.datetime_local_field :scheduled_at, class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-1 bg-white dark:bg-slate-800/60" %>
+          <%= form.text_field :scheduled_at, placeholder: "Select time", data: { controller: "datepicker" }, class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-1 bg-gray-50 dark:bg-slate-900/70 w-64" %>
         </div>
         <%= form.submit "Schedule", class: "rounded-md px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium cursor-pointer" %>
       <% end %>
