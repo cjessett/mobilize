@@ -5,20 +5,20 @@
   <%= link_to "New template", new_sms_template_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
-<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
   <% if @templates.empty? %>
-    <p class="p-6 text-slate-400">No templates yet.</p>
+    <p class="p-6 text-gray-500 dark:text-slate-400">No templates yet.</p>
   <% end %>
   <% @templates.each do |template| %>
     <div class="p-4 flex items-center justify-between">
       <div>
         <div class="font-medium"><%= template.name %></div>
-        <div class="text-sm text-slate-400 truncate max-w-xl"><%= template.body.truncate(120) %></div>
+        <div class="text-sm text-gray-500 dark:text-slate-400 truncate max-w-xl"><%= template.body.truncate(120) %></div>
       </div>
       <div class="flex gap-3">
-        <%= link_to "Use in blast", new_blast_path(template_id: template.id), class: "text-sm text-indigo-400 hover:underline" %>
-        <%= link_to "Edit", edit_sms_template_path(template), class: "text-sm text-indigo-400 hover:underline" %>
-        <%= button_to "Delete", sms_template_path(template), method: :delete, data: { turbo_confirm: "Delete this template?" }, class: "text-sm text-red-400 hover:underline cursor-pointer" %>
+        <%= link_to "Use in blast", new_blast_path(template_id: template.id), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        <%= link_to "Edit", edit_sms_template_path(template), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        <%= button_to "Delete", sms_template_path(template), method: :delete, data: { turbo_confirm: "Delete this template?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
       </div>
     </div>
   <% end %>

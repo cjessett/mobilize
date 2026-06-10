@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark">
+<html class="<%= "dark" if current_theme == "dark" %>">
   <head>
     <title><%= content_for(:title) || "Mobilize" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -23,29 +23,33 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-slate-900 text-slate-200 min-h-screen">
+  <body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-slate-200 min-h-screen">
     <% if authenticated? %>
-      <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-20">
+      <header class="bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-20">
         <div class="flex items-center gap-6 h-16 px-5">
           <%= link_to root_path, class: "flex items-center gap-3 min-w-56" do %>
             <span class="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm"><%= current_organization&.name&.first %></span>
-            <span class="font-semibold text-white truncate"><%= current_organization&.name %></span>
+            <span class="font-semibold text-gray-900 dark:text-white truncate"><%= current_organization&.name %></span>
           <% end %>
           <%= form_with url: people_path, method: :get, class: "flex-1 max-w-2xl" do |form| %>
             <div class="relative">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-              <%= form.text_field :q, placeholder: "Search anything", class: "w-full rounded-lg bg-slate-900 border border-slate-700 pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-indigo-500" %>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+              <%= form.text_field :q, placeholder: "Search anything", class: "w-full rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 pl-10 pr-4 py-2 text-sm text-gray-800 dark:text-slate-200 focus:outline-indigo-500" %>
             </div>
           <% end %>
           <div class="ml-auto flex items-center gap-4">
-            <span class="text-sm text-white font-medium"><%= Current.user&.name %></span>
-            <%= button_to "Sign out", session_path, method: :delete, class: "text-sm text-slate-400 hover:text-red-400 cursor-pointer" %>
+            <%# data-turbo=false: the theme class lives on <html>, which Turbo doesn't swap %>
+            <%= button_to theme_path(theme: current_theme == "dark" ? "light" : "dark"), method: :patch, form: { data: { turbo: false } }, class: "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white cursor-pointer", title: "Switch to #{current_theme == 'dark' ? 'light' : 'dark'} theme" do %>
+              <%= sidebar_icon(current_theme == "dark" ? :sun : :moon) %>
+            <% end %>
+            <span class="text-sm text-gray-900 dark:text-white font-medium"><%= Current.user&.name %></span>
+            <%= button_to "Sign out", session_path, method: :delete, class: "text-sm text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer" %>
           </div>
         </div>
       </header>
 
       <div class="flex">
-        <nav class="w-60 shrink-0 bg-slate-950 min-h-[calc(100vh-4rem)] py-4 sticky top-16 self-start hidden md:block">
+        <nav class="w-60 shrink-0 bg-white dark:bg-slate-950 border-r border-gray-200 dark:border-slate-800 min-h-[calc(100vh-4rem)] py-4 sticky top-16 self-start hidden md:block">
           <%= sidebar_link "People", people_path, icon: :people, active: controller_name == "people" %>
           <div class="mb-2">
             <%= sidebar_sublink "All People", people_path, active: controller_name == "people" && action_name != "import" %>
@@ -60,7 +64,7 @@
           <%= sidebar_link "Pages", forms_path, icon: :box, active: controller_name == "forms" %>
           <%= sidebar_link "Automations", workflows_path, icon: :bolt, active: controller_name == "workflows" %>
 
-          <div class="mt-4 pt-4 border-t border-slate-800">
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-slate-800">
             <%= sidebar_link "SMS", conversations_path, icon: :chat, active: %w[conversations blasts sms_templates keywords].include?(controller_name) %>
             <div class="mb-2">
               <%= sidebar_sublink "Inbox", conversations_path, active: controller_name == "conversations" %>
@@ -71,7 +75,7 @@
             <%= sidebar_link "Email", email_blasts_path, icon: :mail, active: controller_name == "email_blasts" %>
           </div>
 
-          <div class="mt-4 pt-4 border-t border-slate-800">
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-slate-800">
             <%= sidebar_link "Reporting", root_path, icon: :chart, active: controller_name == "dashboard" %>
             <% if current_membership&.admin? %>
               <%= sidebar_link "Settings", settings_organization_path, icon: :cog, active: %w[organizations chapters members].include?(controller_name) %>

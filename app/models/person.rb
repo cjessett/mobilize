@@ -40,7 +40,11 @@ class Person < ApplicationRecord
   after_create :assign_primary_chapter
 
   def name
-    [ first_name, last_name ].compact_blank.join(" ").presence || phone || email
+    [ first_name, last_name ].compact_blank.join(" ").presence || PhoneNumber.format(phone) || email
+  end
+
+  def display_phone
+    PhoneNumber.format(phone)
   end
 
   def primary_chapter

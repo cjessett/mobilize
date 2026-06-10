@@ -2,38 +2,38 @@
 
 <div class="flex items-start justify-between mb-4">
   <div>
-    <h1 class="font-bold text-3xl"><%= @form.title %> <span class="text-sm font-normal bg-slate-700 text-slate-300 rounded-full px-2 py-0.5 align-middle"><%= @form.kind %></span></h1>
-    <div class="text-sm text-slate-500 mt-1">
-      Public page: <%= link_to public_form_url(current_organization.slug, @form.slug), public_form_url(current_organization.slug, @form.slug), class: "text-indigo-400 hover:underline" %>
+    <h1 class="font-bold text-3xl"><%= @form.title %> <span class="text-sm font-normal bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full px-2 py-0.5 align-middle"><%= @form.kind %></span></h1>
+    <div class="text-sm text-gray-400 dark:text-slate-500 mt-1">
+      Public page: <%= link_to public_form_url(current_organization.slug, @form.slug), public_form_url(current_organization.slug, @form.slug), class: "text-indigo-600 dark:text-indigo-400 hover:underline" %>
     </div>
   </div>
   <div class="flex gap-2">
-    <%= link_to "Edit", edit_form_path(@form), class: "rounded-md px-3.5 py-2 border border-slate-600 bg-slate-800/60 hover:bg-slate-700 text-sm font-medium" %>
-    <%= button_to "Delete", @form, method: :delete, data: { turbo_confirm: "Delete this form?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-400 bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
+    <%= link_to "Edit", edit_form_path(@form), class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium" %>
+    <%= button_to "Delete", @form, method: :delete, data: { turbo_confirm: "Delete this form?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-600 dark:text-red-400 bg-white dark:bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
   </div>
 </div>
 
 <% if @form.petition? && @form.goal %>
-  <div class="bg-slate-800/60 rounded-lg border border-slate-700/70 p-4 mb-4">
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 mb-4">
     <div class="flex justify-between text-sm mb-1">
       <span class="font-medium"><%= @form.signature_count %> signatures</span>
-      <span class="text-slate-400">Goal: <%= @form.goal %></span>
+      <span class="text-gray-500 dark:text-slate-400">Goal: <%= @form.goal %></span>
     </div>
-    <div class="bg-slate-700 rounded-full h-2">
+    <div class="bg-gray-200 dark:bg-slate-700 rounded-full h-2">
       <div class="bg-indigo-600 rounded-full h-2" style="width: <%= [ (@form.signature_count * 100.0 / @form.goal), 100 ].min.round %>%"></div>
     </div>
   </div>
 <% end %>
 
 <h2 class="font-semibold text-lg mb-2"><%= @form.petition? ? "Signatures" : "Submissions" %> (<%= @form.signature_count %>)</h2>
-<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
   <% if @submissions.empty? %>
-    <p class="p-4 text-slate-400 text-sm">Nothing yet. Share the public link above.</p>
+    <p class="p-4 text-gray-500 dark:text-slate-400 text-sm">Nothing yet. Share the public link above.</p>
   <% end %>
   <% @submissions.each do |submission| %>
     <div class="p-4 flex items-center justify-between">
-      <%= link_to submission.person.name, submission.person, class: "font-medium text-indigo-400 hover:underline" %>
-      <span class="text-xs text-slate-500"><%= time_ago_in_words(submission.created_at) %> ago</span>
+      <%= link_to submission.person.name, submission.person, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+      <span class="text-xs text-gray-400 dark:text-slate-500"><%= time_ago_in_words(submission.created_at) %> ago</span>
     </div>
   <% end %>
 </div>

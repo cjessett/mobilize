@@ -8,23 +8,23 @@
     <%= link_to "New chapter", new_settings_chapter_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
   </div>
 
-  <div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
     <% @chapters.each do |chapter| %>
       <div class="p-4 flex items-center justify-between">
         <div>
           <div class="font-medium">
             <%= chapter.name %>
-            <% if chapter.default? %><span class="text-xs text-slate-500 ml-1">(default)</span><% end %>
+            <% if chapter.default? %><span class="text-xs text-gray-400 dark:text-slate-500 ml-1">(default)</span><% end %>
           </div>
-          <div class="text-sm text-slate-400">
-            <%= chapter.phone_number.presence || "No phone number" %>
+          <div class="text-sm text-gray-500 dark:text-slate-400">
+            <%= PhoneNumber.format(chapter.phone_number).presence || "No phone number" %>
             · <%= pluralize(chapter.chapter_zip_codes.size, "zip code") %>
           </div>
         </div>
         <div class="flex gap-3">
-          <%= link_to "Edit", edit_settings_chapter_path(chapter), class: "text-sm text-indigo-400 hover:underline" %>
+          <%= link_to "Edit", edit_settings_chapter_path(chapter), class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
           <% unless chapter.default? %>
-            <%= button_to "Delete", settings_chapter_path(chapter), method: :delete, data: { turbo_confirm: "Delete this chapter?" }, class: "text-sm text-red-400 hover:underline cursor-pointer" %>
+            <%= button_to "Delete", settings_chapter_path(chapter), method: :delete, data: { turbo_confirm: "Delete this chapter?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer" %>
           <% end %>
         </div>
       </div>

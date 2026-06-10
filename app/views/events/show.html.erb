@@ -3,39 +3,39 @@
 <div class="flex items-start justify-between mb-4">
   <div>
     <h1 class="font-bold text-3xl"><%= @event.title %></h1>
-    <div class="text-slate-400 mt-1">
+    <div class="text-gray-500 dark:text-slate-400 mt-1">
       <%= @event.starts_at.in_time_zone(current_organization.time_zone).strftime("%A %b %-d, %Y %l:%M %p") %>
       <%= " · #{@event.location}" if @event.location.present? %>
       <%= " · Virtual" if @event.virtual_url.present? %>
     </div>
-    <div class="text-sm text-slate-500 mt-1">
-      Public page: <%= link_to public_event_url(current_organization.slug, @event), public_event_url(current_organization.slug, @event), class: "text-indigo-400 hover:underline" %>
+    <div class="text-sm text-gray-400 dark:text-slate-500 mt-1">
+      Public page: <%= link_to public_event_url(current_organization.slug, @event), public_event_url(current_organization.slug, @event), class: "text-indigo-600 dark:text-indigo-400 hover:underline" %>
     </div>
   </div>
   <div class="flex gap-2">
-    <%= link_to "Edit", edit_event_path(@event), class: "rounded-md px-3.5 py-2 border border-slate-600 bg-slate-800/60 hover:bg-slate-700 text-sm font-medium" %>
-    <%= button_to "Delete", @event, method: :delete, data: { turbo_confirm: "Delete this event?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-400 bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
+    <%= link_to "Edit", edit_event_path(@event), class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium" %>
+    <%= button_to "Delete", @event, method: :delete, data: { turbo_confirm: "Delete this event?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-600 dark:text-red-400 bg-white dark:bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
   </div>
 </div>
 
 <% if @event.description.present? %>
-  <div class="bg-slate-800/60 rounded-lg border border-slate-700/70 p-4 mb-6 text-sm whitespace-pre-wrap"><%= @event.description %></div>
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 mb-6 text-sm whitespace-pre-wrap"><%= @event.description %></div>
 <% end %>
 
 <h2 class="font-semibold text-lg mb-2">
   RSVPs (<%= @event.yes_rsvps.count %><%= "/#{@event.capacity}" if @event.capacity %> going<%= ", #{@event.rsvps.where(status: 'waitlist').count} waitlisted" if @event.rsvps.where(status: "waitlist").any? %>)
 </h2>
-<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
   <% if @rsvps.empty? %>
-    <p class="p-4 text-slate-400 text-sm">No RSVPs yet. Share the public page link above.</p>
+    <p class="p-4 text-gray-500 dark:text-slate-400 text-sm">No RSVPs yet. Share the public page link above.</p>
   <% end %>
   <% @rsvps.each do |rsvp| %>
     <div class="p-4 flex items-center justify-between">
       <div>
-        <%= link_to rsvp.person.name, rsvp.person, class: "font-medium text-indigo-400 hover:underline" %>
-        <span class="text-xs rounded-full px-2 py-0.5 ml-2 <%= { 'yes' => 'bg-green-500/10 text-green-400', 'waitlist' => 'bg-yellow-500/10 text-yellow-300', 'canceled' => 'bg-slate-700 text-slate-500' }[rsvp.status] %>"><%= rsvp.status %></span>
+        <%= link_to rsvp.person.name, rsvp.person, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        <span class="text-xs rounded-full px-2 py-0.5 ml-2 <%= { 'yes' => 'bg-green-500/10 text-green-600 dark:text-green-400', 'waitlist' => 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300', 'canceled' => 'bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-slate-500' }[rsvp.status] %>"><%= rsvp.status %></span>
       </div>
-      <%= button_to rsvp.attended? ? "✓ Attended" : "Check in", check_in_event_path(@event, rsvp_id: rsvp.id), method: :post, class: "text-sm rounded-md px-3 py-1.5 cursor-pointer #{rsvp.attended? ? 'bg-green-600 text-white' : 'border border-slate-600 bg-slate-800/60 hover:bg-slate-700'}" %>
+      <%= button_to rsvp.attended? ? "✓ Attended" : "Check in", check_in_event_path(@event, rsvp_id: rsvp.id), method: :post, class: "text-sm rounded-md px-3 py-1.5 cursor-pointer #{rsvp.attended? ? 'bg-green-600 text-white' : 'border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700'}" %>
     </div>
   <% end %>
 </div>

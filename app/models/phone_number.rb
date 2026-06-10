@@ -13,4 +13,16 @@ module PhoneNumber
   def self.valid?(value)
     normalize(value).to_s.match?(/\A\+\d{11,15}\z/)
   end
+
+  # Display format: "+18058784343" -> "(805) 878-4343". Non-US numbers and
+  # unrecognized values are returned as-is.
+  def self.format(value)
+    return value if value.blank?
+
+    if (match = value.to_s.match(/\A\+1(\d{3})(\d{3})(\d{4})\z/))
+      "(#{match[1]}) #{match[2]}-#{match[3]}"
+    else
+      value
+    end
+  end
 end

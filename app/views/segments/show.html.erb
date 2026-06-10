@@ -3,24 +3,24 @@
 <div class="flex items-center justify-between mb-4">
   <div>
     <h1 class="font-bold text-3xl"><%= @segment.name %></h1>
-    <p class="text-slate-400 text-sm mt-1"><%= @people.size %> people<%= @people.size == 200 ? "+ (showing first 200)" : "" %></p>
+    <p class="text-gray-500 dark:text-slate-400 text-sm mt-1"><%= @people.size %> people<%= @people.size == 200 ? "+ (showing first 200)" : "" %></p>
   </div>
   <div class="flex gap-2">
-    <%= link_to "Edit", edit_segment_path(@segment), class: "rounded-md px-3.5 py-2 border border-slate-600 bg-slate-800/60 hover:bg-slate-700 text-sm font-medium" %>
-    <%= button_to "Delete", @segment, method: :delete, data: { turbo_confirm: "Delete this segment?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-400 bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
+    <%= link_to "Edit", edit_segment_path(@segment), class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium" %>
+    <%= button_to "Delete", @segment, method: :delete, data: { turbo_confirm: "Delete this segment?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-600 dark:text-red-400 bg-white dark:bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
   </div>
 </div>
 
-<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60">
   <% @people.each do |person| %>
     <div class="p-4 flex items-center justify-between">
       <div>
-        <%= link_to person.name, person, class: "font-medium text-indigo-400 hover:underline" %>
-        <div class="text-sm text-slate-400"><%= [ person.phone, person.email ].compact_blank.join(" · ") %></div>
+        <%= link_to person.name, person, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        <div class="text-sm text-gray-500 dark:text-slate-400"><%= [ person.display_phone, person.email ].compact_blank.join(" · ") %></div>
       </div>
       <div class="flex gap-2">
         <% person.tags.each do |tag| %>
-          <span class="text-xs bg-slate-700 text-slate-300 rounded-full px-2 py-0.5"><%= tag.name %></span>
+          <span class="text-xs bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full px-2 py-0.5"><%= tag.name %></span>
         <% end %>
       </div>
     </div>

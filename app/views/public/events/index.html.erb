@@ -2,12 +2,12 @@
 
 <div class="space-y-4">
   <% if @events.empty? %>
-    <p class="text-slate-400">No upcoming events.</p>
+    <p class="text-gray-500 dark:text-slate-400">No upcoming events.</p>
   <% end %>
   <% @events.each do |event| %>
-    <%= link_to public_event_path(@organization.slug, event), class: "block bg-slate-800/60 rounded-lg border border-slate-700/70 p-5 hover:border-indigo-500" do %>
-      <div class="font-semibold text-lg text-slate-100"><%= event.title %></div>
-      <div class="text-sm text-slate-400 mt-1">
+    <%= link_to public_event_path(@organization.slug, event), class: "block bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-5 hover:border-indigo-500" do %>
+      <div class="font-semibold text-lg text-gray-900 dark:text-slate-100"><%= event.title %></div>
+      <div class="text-sm text-gray-500 dark:text-slate-400 mt-1">
         <%= event.starts_at.in_time_zone(@organization.time_zone).strftime("%A %b %-d, %l:%M %p") %>
         <%= " · #{event.location}" if event.location.present? %>
       </div>

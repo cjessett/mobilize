@@ -1,64 +1,64 @@
 <%= render "shared/flash" %>
 
 <div class="flex items-center justify-between mb-1">
-  <h1 class="font-bold text-3xl text-white">All People</h1>
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">All People</h1>
   <div class="flex gap-2">
-    <%= link_to "Import", import_people_path, class: "rounded-md px-4 py-2 border border-indigo-500/50 text-indigo-300 hover:bg-indigo-500/10 text-sm font-medium" %>
+    <%= link_to "Import", import_people_path, class: "rounded-md px-4 py-2 border border-indigo-500/50 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/10 text-sm font-medium" %>
     <%= link_to "Add New Person", new_person_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
   </div>
 </div>
-<p class="text-slate-400 italic mb-5"><%= @people.size %> results</p>
+<p class="text-gray-500 dark:text-slate-400 italic mb-5"><%= @people.size %> results</p>
 
-<div class="bg-slate-800/40 rounded-xl border border-slate-700/70">
-  <%= form_with url: people_path, method: :get, class: "flex gap-2 p-4 border-b border-slate-700/70" do |form| %>
-    <%= form.text_field :q, value: params[:q], placeholder: "Filter by name, phone, email", class: "shadow-sm rounded-md border border-slate-600 px-3 py-2 w-72 bg-slate-900 text-sm" %>
-    <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + current_membership.accessible_chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-slate-600 px-3 py-2 bg-slate-900 text-sm" } %>
-    <%= form.submit "Filter", class: "rounded-md px-3.5 py-2 border border-slate-600 hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
+  <%= form_with url: people_path, method: :get, class: "flex gap-2 p-4 border-b border-gray-200 dark:border-slate-700/70" do |form| %>
+    <%= form.text_field :q, value: params[:q], placeholder: "Filter by name, phone, email", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 w-72 bg-white dark:bg-slate-900 text-sm" %>
+    <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + current_membership.accessible_chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-900 text-sm" } %>
+    <%= form.submit "Filter", class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
   <% end %>
 
   <table class="w-full text-left">
     <thead>
-      <tr class="text-xs uppercase tracking-wider text-slate-500">
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
         <th class="px-4 py-3 font-semibold">Name</th>
         <th class="px-4 py-3 font-semibold">Last activity</th>
         <th class="px-4 py-3 font-semibold">Tags</th>
         <th class="px-4 py-3 font-semibold">Chapter</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-slate-700/60">
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
       <% if @people.empty? %>
-        <tr><td colspan="4" class="px-4 py-6 text-slate-400">No people yet. Add someone or import a CSV.</td></tr>
+        <tr><td colspan="4" class="px-4 py-6 text-gray-500 dark:text-slate-400">No people yet. Add someone or import a CSV.</td></tr>
       <% end %>
       <% @people.each do |person| %>
         <% activity = @latest_activity[person.id] %>
-        <tr class="hover:bg-slate-800">
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
-              <span class="h-10 w-10 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-semibold uppercase shrink-0">
+              <span class="h-10 w-10 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 flex items-center justify-center text-xs font-semibold uppercase shrink-0">
                 <%= person.name.split.map(&:first).first(2).join %>
               </span>
               <div>
-                <%= link_to person.name, person, class: "font-medium text-indigo-400 hover:underline" %>
-                <div class="text-sm text-slate-400"><%= person.phone || person.email %></div>
+                <%= link_to person.name, person, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+                <div class="text-sm text-gray-500 dark:text-slate-400"><%= person.display_phone || person.email %></div>
               </div>
             </div>
           </td>
           <td class="px-4 py-3 text-sm">
             <% if activity %>
-              <div class="text-slate-200"><%= activity.kind.humanize %></div>
-              <div class="text-slate-500 text-xs"><%= time_ago_in_words(activity.occurred_at) %> ago</div>
+              <div class="text-gray-800 dark:text-slate-200"><%= activity.kind.humanize %></div>
+              <div class="text-gray-400 dark:text-slate-500 text-xs"><%= time_ago_in_words(activity.occurred_at) %> ago</div>
             <% else %>
-              <span class="text-slate-500">—</span>
+              <span class="text-gray-400 dark:text-slate-500">—</span>
             <% end %>
           </td>
           <td class="px-4 py-3">
             <div class="flex flex-wrap gap-1">
               <% person.tags.first(3).each do |tag| %>
-                <span class="text-xs bg-slate-700 text-slate-300 rounded-full px-2 py-0.5"><%= tag.name %></span>
+                <span class="text-xs bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-full px-2 py-0.5"><%= tag.name %></span>
               <% end %>
             </div>
           </td>
-          <td class="px-4 py-3 text-sm text-slate-400"><%= person.primary_chapter&.name %></td>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-slate-400"><%= person.primary_chapter&.name %></td>
         </tr>
       <% end %>
     </tbody>

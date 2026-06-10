@@ -5,17 +5,17 @@
 
   <%= form_with model: @organization, url: settings_organization_path, method: :patch, class: "contents" do |form| %>
     <div class="my-5">
-      <%= form.label :name, class: "block text-sm font-medium text-slate-300" %>
-      <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
     </div>
     <div class="my-5">
-      <%= form.label :slug, "Public URL slug", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.text_field :slug, required: true, class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
-      <p class="text-xs text-slate-500 mt-1">Used for public pages: /o/<%= @organization.slug %>/...</p>
+      <%= form.label :slug, "Public URL slug", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.text_field :slug, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
+      <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">Used for public pages: /o/<%= @organization.slug %>/...</p>
     </div>
     <div class="my-5">
-      <%= form.label :time_zone, class: "block text-sm font-medium text-slate-300" %>
-      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full bg-slate-800/60" } %>
+      <%= form.label :time_zone, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" } %>
     </div>
     <%= form.submit "Save", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
   <% end %>

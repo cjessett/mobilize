@@ -1,11 +1,22 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 html {
+  color-scheme: light;
+}
+
+html.dark {
   color-scheme: dark;
 }
 
 input::placeholder,
 textarea::placeholder {
+  color: var(--color-gray-400);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
   color: var(--color-slate-500);
 }
 

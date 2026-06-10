@@ -1,52 +1,52 @@
 <%= form_with model: event, class: "contents" do |form| %>
   <% if event.errors.any? %>
-    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-400 font-medium rounded-lg inline-block"><%= event.errors.full_messages.to_sentence %></p>
+    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= event.errors.full_messages.to_sentence %></p>
   <% end %>
 
   <div class="my-5">
-    <%= form.label :title, class: "block text-sm font-medium text-slate-300" %>
-    <%= form.text_field :title, required: true, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+    <%= form.label :title, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+    <%= form.text_field :title, required: true, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
   </div>
 
   <div class="my-5">
-    <%= form.label :description, class: "block text-sm font-medium text-slate-300" %>
-    <%= form.text_area :description, rows: 4, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+    <%= form.label :description, class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+    <%= form.text_area :description, rows: 4, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
   </div>
 
   <div class="my-5 grid md:grid-cols-3 gap-4">
     <div>
-      <%= form.label :starts_at, "Starts (#{current_organization.time_zone})", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.datetime_local_field :starts_at, required: true, value: event.starts_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+      <%= form.label :starts_at, "Starts (#{current_organization.time_zone})", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.datetime_local_field :starts_at, required: true, value: event.starts_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
     </div>
     <div>
-      <%= form.label :ends_at, "Ends (optional)", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.datetime_local_field :ends_at, value: event.ends_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+      <%= form.label :ends_at, "Ends (optional)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.datetime_local_field :ends_at, value: event.ends_at&.in_time_zone(current_organization.time_zone)&.strftime("%Y-%m-%dT%H:%M"), class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
     </div>
     <div>
-      <%= form.label :capacity, "Capacity (optional)", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.number_field :capacity, min: 1, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+      <%= form.label :capacity, "Capacity (optional)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.number_field :capacity, min: 1, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
     </div>
   </div>
 
   <div class="my-5 grid md:grid-cols-2 gap-4">
     <div>
-      <%= form.label :location, "Location (in person)", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.text_field :location, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+      <%= form.label :location, "Location (in person)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.text_field :location, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
     </div>
     <div>
-      <%= form.label :virtual_url, "Virtual link (Zoom etc.)", class: "block text-sm font-medium text-slate-300" %>
-      <%= form.url_field :virtual_url, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" %>
+      <%= form.label :virtual_url, "Virtual link (Zoom etc.)", class: "block text-sm font-medium text-gray-700 dark:text-slate-300" %>
+      <%= form.url_field :virtual_url, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 w-full bg-white dark:bg-slate-800/60" %>
     </div>
   </div>
 
   <div class="my-5">
-    <label class="block text-sm font-medium text-slate-300">Scope</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300">Scope</label>
     <%= select_tag "event[access_scope_gid]",
           options_for_select(
             [ [ "Organization-wide", "organization" ] ] + current_organization.chapters.order(:name).map { |c| [ c.name, "chapter-#{c.id}" ] },
             event.access_scope.is_a?(Chapter) ? "chapter-#{event.access_scope_id}" : "organization"
           ),
-          class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 bg-slate-800/60" %>
+          class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-2 bg-white dark:bg-slate-800/60" %>
   </div>
 
   <%= form.submit event.persisted? ? "Save event" : "Create event", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
