@@ -1,0 +1,34 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <%= render "shared/flash" %>
+  <h1 class="font-bold text-3xl mb-4">Settings</h1>
+  <%= render "settings/nav" %>
+
+  <h2 class="font-semibold text-xl mb-4">Custom fields</h2>
+
+  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100 mb-6">
+    <% if @custom_fields.empty? %>
+      <p class="p-4 text-gray-500 text-sm">No custom fields yet.</p>
+    <% end %>
+    <% @custom_fields.each do |field| %>
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <span class="font-medium"><%= field.label %></span>
+          <span class="text-sm text-gray-400 ml-2"><%= field.key %> · <%= field.field_type %></span>
+        </div>
+        <%= button_to "Remove", settings_custom_field_path(field), method: :delete, data: { turbo_confirm: "Remove this field? Values stored on people are kept but hidden." }, class: "text-sm text-red-600 hover:underline cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= form_with model: @custom_field, url: settings_custom_fields_path, class: "flex gap-2 items-end" do |form| %>
+    <div>
+      <%= form.label :label, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :label, required: true, class: "block shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white" %>
+    </div>
+    <div>
+      <%= form.label :field_type, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.select :field_type, CustomField::FIELD_TYPES, {}, { class: "block shadow-sm rounded-md border border-gray-300 px-3 py-2 mt-1 bg-white" } %>
+    </div>
+    <%= form.submit "Add field", class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium cursor-pointer" %>
+  <% end %>
+</div>

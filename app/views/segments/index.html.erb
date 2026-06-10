@@ -1,0 +1,24 @@
+<%= render "shared/flash" %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="font-bold text-3xl">Segments</h1>
+  <%= link_to "New segment", new_segment_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+  <% if @segments.empty? %>
+    <p class="p-6 text-gray-500">No segments yet. Segments are saved filters over your people.</p>
+  <% end %>
+  <% @segments.each do |segment| %>
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <%= link_to segment.name, segment, class: "font-medium text-blue-700 hover:underline" %>
+        <div class="text-sm text-gray-500">
+          <%= pluralize(segment.conditions.size, "condition") %>
+          · <%= segment.org_scoped? ? "Organization-wide" : segment.chapter.name %>
+        </div>
+      </div>
+      <span class="text-sm text-gray-400"><%= segment.people.count %> people</span>
+    </div>
+  <% end %>
+</div>

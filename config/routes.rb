@@ -5,10 +5,20 @@ Rails.application.routes.draw do
 
   root "dashboard#show"
 
+  resources :people do
+    collection do
+      get :import
+      post :import
+    end
+    resources :notes, only: :create
+  end
+  resources :segments
+
   namespace :settings do
     resource :organization, only: [ :show, :update ]
     resources :chapters
     resources :members, only: [ :index, :new, :create, :destroy ]
+    resources :custom_fields, only: [ :index, :create, :destroy ]
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

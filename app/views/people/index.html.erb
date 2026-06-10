@@ -1,0 +1,37 @@
+<%= render "shared/flash" %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="font-bold text-3xl">People</h1>
+  <div class="flex gap-2">
+    <%= link_to "Import CSV", import_people_path, class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium" %>
+    <%= link_to "Add person", new_person_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+  </div>
+</div>
+
+<%= form_with url: people_path, method: :get, class: "flex gap-2 mb-4" do |form| %>
+  <%= form.text_field :q, value: params[:q], placeholder: "Search name, phone, email", class: "shadow-sm rounded-md border border-gray-300 px-3 py-2 w-72 bg-white" %>
+  <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + current_membership.accessible_chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-gray-300 px-3 py-2 bg-white" } %>
+  <%= form.submit "Filter", class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium cursor-pointer" %>
+<% end %>
+
+<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+  <% if @people.empty? %>
+    <p class="p-6 text-gray-500">No people yet. Add someone or import a CSV.</p>
+  <% end %>
+  <% @people.each do |person| %>
+    <div class="p-4 flex items-center justify-between">
+      <div>
+        <%= link_to person.name, person, class: "font-medium text-blue-700 hover:underline" %>
+        <div class="text-sm text-gray-500">
+          <%= [ person.phone, person.email ].compact_blank.join(" · ") %>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <% person.tags.each do |tag| %>
+          <span class="text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5"><%= tag.name %></span>
+        <% end %>
+        <span class="text-xs text-gray-400"><%= person.chapters.map(&:name).join(", ") %></span>
+      </div>
+    </div>
+  <% end %>
+</div>

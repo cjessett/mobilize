@@ -5,6 +5,9 @@ class Organization < ApplicationRecord
   has_many :people, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
+  has_many :custom_fields, dependent: :destroy
+  has_many :tags, dependent: :destroy
+  has_many :segments, dependent: :destroy
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }

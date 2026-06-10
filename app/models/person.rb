@@ -3,6 +3,26 @@ class Person < ApplicationRecord
   has_one :user, dependent: :nullify
   has_many :chapter_memberships, dependent: :destroy
   has_many :chapters, through: :chapter_memberships
+  has_many :taggings, dependent: :destroy
+  has_many :tags, through: :taggings
+  has_many :notes, dependent: :destroy
+  has_many :activities, dependent: :destroy
+
+  scope :visible_to, ->(membership) {
+    scope = where(organization: membership.organization)
+    if membership.org_wide?
+      scope
+    else
+      scope.where(id: ChapterMembership.where(chapter: membership.accessible_chapters).select(:person_id))
+    end
+  }
+
+  scope :search, ->(query) {
+    next all if query.blank?
+
+    term = "%#{sanitize_sql_like(query.strip)}%"
+    where("first_name LIKE :t OR last_name LIKE :t OR phone LIKE :t OR email LIKE :t", t: term)
+  }
 
   normalizes :phone, with: ->(value) { PhoneNumber.normalize(value) }
   normalizes :email, with: ->(value) { value.strip.downcase.presence }
@@ -34,10 +54,30 @@ class Person < ApplicationRecord
     end
   end
 
+  def tag_list
+    tags.order(:name).pluck(:name).join(", ")
+  end
+
+  def tag_list=(names)
+    names = names.split(",") if names.is_a?(String)
+    @pending_tag_names = names.map { |n| n.to_s.strip }.reject(&:blank?).uniq
+  end
+
+  after_save :sync_tags
+
   def opted_out_sms? = opted_out_sms_at.present?
   def unsubscribed_email? = unsubscribed_email_at.present?
 
   private
+
+  def sync_tags
+    return if @pending_tag_names.nil?
+
+    desired = @pending_tag_names.map { |name| organization.tags.find_or_create_by!(name: name) }
+    taggings.where.not(tag_id: desired.map(&:id)).destroy_all
+    desired.each { |tag| taggings.find_or_create_by!(tag: tag) }
+    @pending_tag_names = nil
+  end
 
   def phone_or_email_present
     errors.add(:base, "Phone or email is required") if phone.blank? && email.blank?
