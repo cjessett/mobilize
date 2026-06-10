@@ -1,0 +1,30 @@
+class Organization < ApplicationRecord
+  belongs_to :parent, class_name: "Organization", optional: true
+  has_many :sub_organizations, class_name: "Organization", foreign_key: :parent_id, dependent: :destroy
+  has_many :chapters, dependent: :destroy
+  has_many :people, dependent: :destroy
+  has_many :memberships, dependent: :destroy
+  has_many :users, through: :memberships
+
+  validates :name, presence: true
+  validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name } + ActiveSupport::TimeZone.all.map(&:name) }
+
+  before_validation :generate_slug, on: :create
+
+  def default_chapter
+    chapters.find_by(default: true) || chapters.first
+  end
+
+  def chapter_for_zip(zip_code)
+    return nil if zip_code.blank?
+
+    chapters.joins(:chapter_zip_codes).find_by(chapter_zip_codes: { zip_code: zip_code.to_s.strip[0, 5] })
+  end
+
+  private
+
+  def generate_slug
+    self.slug ||= name.to_s.parameterize.presence
+  end
+end

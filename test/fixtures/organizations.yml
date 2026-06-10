@@ -1,0 +1,9 @@
+riverside:
+  name: Riverside Tenants Union
+  slug: riverside
+  time_zone: America/Chicago
+
+other_org:
+  name: Other Org
+  slug: other-org
+  time_zone: UTC

@@ -1,0 +1,15 @@
+main:
+  organization: riverside
+  name: Main
+  phone_number: "+15550001111"
+  default: true
+
+north:
+  organization: riverside
+  name: North Side
+  phone_number: "+15550002222"
+
+other_main:
+  organization: other_org
+  name: Main
+  default: true

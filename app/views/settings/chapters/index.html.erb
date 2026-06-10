@@ -1,0 +1,33 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <%= render "shared/flash" %>
+  <h1 class="font-bold text-3xl mb-4">Settings</h1>
+  <%= render "settings/nav" %>
+
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="font-semibold text-xl">Chapters</h2>
+    <%= link_to "New chapter", new_settings_chapter_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+    <% @chapters.each do |chapter| %>
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <div class="font-medium">
+            <%= chapter.name %>
+            <% if chapter.default? %><span class="text-xs text-gray-400 ml-1">(default)</span><% end %>
+          </div>
+          <div class="text-sm text-gray-500">
+            <%= chapter.phone_number.presence || "No phone number" %>
+            · <%= pluralize(chapter.chapter_zip_codes.size, "zip code") %>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <%= link_to "Edit", edit_settings_chapter_path(chapter), class: "text-sm text-blue-700 hover:underline" %>
+          <% unless chapter.default? %>
+            <%= button_to "Delete", settings_chapter_path(chapter), method: :delete, data: { turbo_confirm: "Delete this chapter?" }, class: "text-sm text-red-600 hover:underline cursor-pointer" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

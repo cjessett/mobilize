@@ -1,0 +1,9 @@
+admin_main:
+  chapter: main
+  person: admin_person
+  primary: true
+
+maria_north:
+  chapter: north
+  person: maria
+  primary: true

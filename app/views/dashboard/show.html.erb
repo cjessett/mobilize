@@ -1,0 +1,23 @@
+<%= render "shared/flash" %>
+
+<h1 class="font-bold text-3xl"><%= @organization.name %></h1>
+
+<div class="grid md:grid-cols-3 gap-4 mt-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <div class="text-sm text-gray-500">People</div>
+    <div class="text-3xl font-bold mt-1"><%= @people_count %></div>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <div class="text-sm text-gray-500">Chapters</div>
+    <div class="text-3xl font-bold mt-1"><%= @chapters.size %></div>
+    <ul class="mt-2 text-sm text-gray-600">
+      <% @chapters.each do |chapter| %>
+        <li><%= chapter.name %><%= " — #{chapter.phone_number}" if chapter.phone_number.present? %></li>
+      <% end %>
+    </ul>
+  </div>
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <div class="text-sm text-gray-500">Your role</div>
+    <div class="text-3xl font-bold mt-1 capitalize"><%= current_membership&.role %></div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+admin:
+  user: one
+  organization: riverside
+  role: admin
+  access_scope: riverside (Organization)
+
+organizer_north:
+  user: two
+  organization: riverside
+  role: organizer
+  access_scope: north (Chapter)

@@ -1,0 +1,13 @@
+admin_person:
+  organization: riverside
+  first_name: Alex
+  last_name: Admin
+  email: one@example.com
+  phone: "+15551230001"
+
+maria:
+  organization: riverside
+  first_name: Maria
+  last_name: Lopez
+  phone: "+15551230002"
+  zip_code: "60601"

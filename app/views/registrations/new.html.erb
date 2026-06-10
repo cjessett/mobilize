@@ -1,0 +1,57 @@
+<div class="mx-auto md:w-1/2 w-full">
+  <%= render "shared/flash" %>
+
+  <h1 class="font-bold text-4xl">Create your organization</h1>
+  <p class="text-gray-500 mt-2">Set up Mobilize for your organization. You'll be the first admin.</p>
+
+  <%= form_with url: registration_url, class: "contents" do |form| %>
+    <div class="my-5">
+      <%= form.label :organization_name, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :organization_name, required: true, autofocus: true, placeholder: "e.g. Riverside Tenants Union", class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5 grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :first_name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :first_name, required: true, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+      <div>
+        <%= form.label :last_name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :last_name, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :email_address, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.email_field :email_address, required: true, autocomplete: "username", class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :phone, "Phone (optional)", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.telephone_field :phone, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+    </div>
+
+    <div class="my-5">
+      <%= form.label :time_zone, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, { default: "Central Time (US & Canada)" }, { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full bg-white" } %>
+    </div>
+
+    <div class="my-5 grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :password, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+      <div>
+        <%= form.label :password_confirmation, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+    </div>
+
+    <div class="sm:flex sm:items-center sm:gap-4">
+      <%= form.submit "Create organization", class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+      <div class="mt-4 text-sm text-gray-500 sm:mt-0">
+        Already have an account? <%= link_to "Sign in", new_session_path, class: "text-gray-700 underline hover:no-underline" %>
+      </div>
+    </div>
+  <% end %>
+</div>

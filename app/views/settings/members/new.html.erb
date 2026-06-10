@@ -1,0 +1,30 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <%= render "shared/flash" %>
+  <h1 class="font-bold text-3xl mb-4">Invite member</h1>
+
+  <%= form_with url: settings_members_path, class: "contents" do |form| %>
+    <div class="my-5 grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :first_name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :first_name, required: true, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+      <div>
+        <%= form.label :last_name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :last_name, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+    </div>
+    <div class="my-5">
+      <%= form.label :email_address, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.email_field :email_address, required: true, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+    </div>
+    <div class="my-5">
+      <%= form.label :role, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.select :role, Membership::ROLES.map { |r| [ r.capitalize, r ] }, {}, { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full bg-white" } %>
+    </div>
+    <div class="my-5">
+      <%= form.label :chapter_id, "Chapter access", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.select :chapter_id, [ [ "All chapters (organization-wide)", "" ] ] + current_organization.chapters.order(:name).map { |c| [ c.name, c.id ] }, {}, { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full bg-white" } %>
+    </div>
+    <%= form.submit "Send invite", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+  <% end %>
+</div>
