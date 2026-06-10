@@ -36,6 +36,7 @@
           <%= link_to "Templates", sms_templates_path, class: "text-sm text-gray-700 hover:text-blue-700" %>
           <%= link_to "Keywords", keywords_path, class: "text-sm text-gray-700 hover:text-blue-700" %>
           <%= link_to "Email", email_blasts_path, class: "text-sm text-gray-700 hover:text-blue-700" %>
+          <%= link_to "Workflows", workflows_path, class: "text-sm text-gray-700 hover:text-blue-700" %>
           <div class="ml-auto flex items-center gap-4">
             <% if current_membership&.admin? %>
               <%= link_to "Settings", settings_organization_path, class: "text-sm text-gray-700 hover:text-blue-700" %>

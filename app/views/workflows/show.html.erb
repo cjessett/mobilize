@@ -1,0 +1,45 @@
+<%= render "shared/flash" %>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <div class="flex items-center justify-between mb-2">
+    <h1 class="font-bold text-3xl"><%= @workflow.name %></h1>
+    <div class="flex gap-2">
+      <%= button_to @workflow.enabled? ? "Disable" : "Enable", toggle_workflow_path(@workflow), method: :post, class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium cursor-pointer" %>
+      <%= link_to "Edit", edit_workflow_path(@workflow), class: "rounded-md px-3.5 py-2 border border-gray-300 bg-white hover:bg-gray-100 text-sm font-medium" %>
+      <%= button_to "Delete", @workflow, method: :delete, data: { turbo_confirm: "Delete this workflow?" }, class: "rounded-md px-3.5 py-2 border border-red-200 text-red-600 bg-white hover:bg-red-50 text-sm font-medium cursor-pointer" %>
+    </div>
+  </div>
+
+  <p class="text-gray-500 text-sm mb-4">
+    When <strong><%= @workflow.trigger.humanize.downcase %></strong><%= " matching \"#{@workflow.trigger_param}\"" if @workflow.trigger_param.present? %>
+    · <%= @workflow.enabled? ? "Enabled" : "Disabled" %>
+  </p>
+
+  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100 mb-6">
+    <% @workflow.workflow_steps.each_with_index do |step, index| %>
+      <div class="p-4 flex gap-3 items-baseline">
+        <span class="text-xs text-gray-400 font-mono"><%= index + 1 %>.</span>
+        <div>
+          <span class="font-medium"><%= step.action.humanize %></span>
+          <span class="text-sm text-gray-500"><%= step.params.map { |k, v| "#{k}: #{v.to_s.truncate(80)}" }.join(" · ") %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <h2 class="font-semibold text-lg mb-2">Recent runs</h2>
+  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+    <% if @runs.empty? %>
+      <p class="p-4 text-gray-500 text-sm">No runs yet.</p>
+    <% end %>
+    <% @runs.each do |run| %>
+      <div class="p-4 flex items-center justify-between">
+        <%= link_to run.person.name, run.person, class: "text-blue-700 hover:underline text-sm" %>
+        <div class="text-sm text-gray-500">
+          <span class="<%= { 'completed' => 'text-green-600', 'failed' => 'text-red-600', 'running' => 'text-blue-600' }[run.status] %>"><%= run.status %></span>
+          · <%= time_ago_in_words(run.created_at) %> ago
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

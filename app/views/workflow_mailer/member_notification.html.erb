@@ -1,0 +1,5 @@
+<p>Workflow <strong><%= @workflow.name %></strong> matched <strong><%= @person.name %></strong>.</p>
+<p>
+  <%= [ @person.phone, @person.email ].compact_blank.join(" · ") %><br>
+  Chapter: <%= @person.primary_chapter&.name %>
+</p>

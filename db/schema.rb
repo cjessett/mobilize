@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_040000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -303,6 +303,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_030000) do
     t.index ["person_id"], name: "index_users_on_person_id"
   end
 
+  create_table "workflow_runs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "current_position", default: 0, null: false
+    t.string "error_message"
+    t.datetime "finished_at"
+    t.integer "person_id", null: false
+    t.string "status", default: "running", null: false
+    t.datetime "updated_at", null: false
+    t.integer "workflow_id", null: false
+    t.index ["person_id"], name: "index_workflow_runs_on_person_id"
+    t.index ["workflow_id"], name: "index_workflow_runs_on_workflow_id"
+  end
+
+  create_table "workflow_steps", force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.json "params", default: {}, null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.integer "workflow_id", null: false
+    t.index ["workflow_id", "position"], name: "index_workflow_steps_on_workflow_id_and_position", unique: true
+    t.index ["workflow_id"], name: "index_workflow_steps_on_workflow_id"
+  end
+
+  create_table "workflows", force: :cascade do |t|
+    t.integer "access_scope_id", null: false
+    t.string "access_scope_type", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.string "trigger", null: false
+    t.string "trigger_param"
+    t.datetime "updated_at", null: false
+    t.index ["access_scope_type", "access_scope_id"], name: "index_workflows_on_access_scope"
+    t.index ["organization_id", "trigger"], name: "index_workflows_on_organization_id_and_trigger"
+    t.index ["organization_id"], name: "index_workflows_on_organization_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "organizations"
@@ -337,4 +376,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_030000) do
   add_foreign_key "taggings", "tags"
   add_foreign_key "tags", "organizations"
   add_foreign_key "users", "people"
+  add_foreign_key "workflow_runs", "people"
+  add_foreign_key "workflow_runs", "workflows"
+  add_foreign_key "workflow_steps", "workflows"
+  add_foreign_key "workflows", "organizations"
 end

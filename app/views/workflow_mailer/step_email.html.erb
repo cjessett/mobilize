@@ -1,0 +1,8 @@
+<div style="max-width: 600px; margin: 0 auto; font-family: sans-serif; color: #1f2937;">
+  <%= simple_format @body %>
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+  <p style="font-size: 12px; color: #9ca3af;">
+    Sent by <%= @person.organization.name %>.
+    <a href="<%= @unsubscribe_url %>" style="color: #9ca3af;">Unsubscribe</a>
+  </p>
+</div>

@@ -1,0 +1,22 @@
+<div data-step-row class="flex gap-2 items-start bg-white border border-gray-200 rounded-md p-2">
+  <%= select_tag "workflow[steps][][action]",
+        options_for_select([ [ "Send SMS", "send_sms" ], [ "Send email", "send_email" ], [ "Add tag", "add_tag" ], [ "Remove tag", "remove_tag" ], [ "Wait", "wait" ], [ "Notify member", "notify_member" ] ], step["action"]),
+        data: { role: "action", action: "steps#actionChanged" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white" %>
+
+  <%= text_field_tag "workflow[steps][][subject]", step["subject"], placeholder: "Email subject",
+        data: { role: "subject" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white w-48" %>
+
+  <%= text_area_tag "workflow[steps][][body]", step["body"], placeholder: "Message… ({{first_name}} works here)", rows: 2,
+        data: { role: "body" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white flex-1" %>
+
+  <%= text_field_tag "workflow[steps][][tag_name]", step["tag_name"], placeholder: "tag name",
+        data: { role: "tag_name" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white w-36" %>
+
+  <%= number_field_tag "workflow[steps][][duration_minutes]", step["duration_minutes"], placeholder: "minutes", min: 1,
+        data: { role: "duration_minutes" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white w-28" %>
+
+  <%= email_field_tag "workflow[steps][][email]", step["email"], placeholder: "member email",
+        data: { role: "email" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white w-52" %>
+
+  <button type="button" data-action="steps#remove" class="ml-auto text-sm text-red-500 hover:underline cursor-pointer mt-1.5">Remove</button>
+</div>

@@ -34,6 +34,11 @@ Rails.application.routes.draw do
       post :cancel
     end
   end
+  resources :workflows do
+    member do
+      post :toggle
+    end
+  end
   get "unsubscribe/:token", to: "email_tracking#unsubscribe", as: :unsubscribe
   get "email/open/:token", to: "email_tracking#open", as: :email_open
   resources :keywords, only: [ :index, :create, :destroy ]

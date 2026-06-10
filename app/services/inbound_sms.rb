@@ -30,7 +30,10 @@ class InboundSms
     )
 
     handle_opt_keywords(person)
-    Keyword.match(organization, @body)&.apply!(person)
+    if (keyword = Keyword.match(organization, @body))
+      keyword.apply!(person)
+      Workflow.fire(trigger: "keyword_received", person: person, param: keyword.word)
+    end
 
     message
   end
