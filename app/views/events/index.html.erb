@@ -2,35 +2,35 @@
 
 <div class="flex items-center justify-between mb-4">
   <h1 class="font-bold text-3xl">Events</h1>
-  <%= link_to "New event", new_event_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+  <%= link_to "New event", new_event_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
 <h2 class="font-semibold text-lg mb-2">Upcoming</h2>
-<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100 mb-6">
+<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60 mb-6">
   <% if @upcoming.empty? %>
-    <p class="p-6 text-gray-500">No upcoming events.</p>
+    <p class="p-6 text-slate-400">No upcoming events.</p>
   <% end %>
   <% @upcoming.each do |event| %>
     <div class="p-4 flex items-center justify-between">
       <div>
-        <%= link_to event.title, event, class: "font-medium text-blue-700 hover:underline" %>
-        <div class="text-sm text-gray-500">
+        <%= link_to event.title, event, class: "font-medium text-indigo-400 hover:underline" %>
+        <div class="text-sm text-slate-400">
           <%= event.starts_at.in_time_zone(current_organization.time_zone).strftime("%a %b %-d, %l:%M %p") %>
           <%= " · #{event.location}" if event.location.present? %>
         </div>
       </div>
-      <span class="text-sm text-gray-400"><%= event.yes_rsvps.count %><%= "/#{event.capacity}" if event.capacity %> going</span>
+      <span class="text-sm text-slate-500"><%= event.yes_rsvps.count %><%= "/#{event.capacity}" if event.capacity %> going</span>
     </div>
   <% end %>
 </div>
 
 <% if @past.any? %>
   <h2 class="font-semibold text-lg mb-2">Past</h2>
-  <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+  <div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
     <% @past.each do |event| %>
       <div class="p-4 flex items-center justify-between">
-        <%= link_to event.title, event, class: "text-gray-600 hover:underline" %>
-        <span class="text-sm text-gray-400"><%= event.starts_at.strftime("%b %-d, %Y") %> · <%= event.rsvps.where(attended: true).count %> attended</span>
+        <%= link_to event.title, event, class: "text-slate-300 hover:underline" %>
+        <span class="text-sm text-slate-500"><%= event.starts_at.strftime("%b %-d, %Y") %> · <%= event.rsvps.where(attended: true).count %> attended</span>
       </div>
     <% end %>
   </div>

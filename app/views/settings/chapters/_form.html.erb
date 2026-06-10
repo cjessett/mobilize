@@ -1,20 +1,20 @@
 <%= form_with model: chapter, url: chapter.persisted? ? settings_chapter_path(chapter) : settings_chapters_path, class: "contents" do |form| %>
   <% if chapter.errors.any? %>
-    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block"><%= chapter.errors.full_messages.to_sentence %></p>
+    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-400 font-medium rounded-lg inline-block"><%= chapter.errors.full_messages.to_sentence %></p>
   <% end %>
   <div class="my-5">
-    <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+    <%= form.label :name, class: "block text-sm font-medium text-slate-300" %>
+    <%= form.text_field :name, required: true, class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
   </div>
   <div class="my-5">
-    <%= form.label :phone_number, "Chapter phone number", class: "block text-sm font-medium text-gray-700" %>
-    <%= form.telephone_field :phone_number, placeholder: "+15551234567", class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-    <p class="text-xs text-gray-400 mt-1">Texts and calls to this chapter's people are sent from this number.</p>
+    <%= form.label :phone_number, "Chapter phone number", class: "block text-sm font-medium text-slate-300" %>
+    <%= form.telephone_field :phone_number, placeholder: "+15551234567", class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
+    <p class="text-xs text-slate-500 mt-1">Texts and calls to this chapter's people are sent from this number.</p>
   </div>
   <div class="my-5">
-    <%= form.label :zip_codes_list, "Zip codes", class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_area :zip_codes_list, value: chapter.persisted? ? chapter.zip_codes_list.join(", ") : "", rows: 3, placeholder: "60601, 60602, 60603", class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-    <p class="text-xs text-gray-400 mt-1">People with these zip codes are automatically assigned to this chapter.</p>
+    <%= form.label :zip_codes_list, "Zip codes", class: "block text-sm font-medium text-slate-300" %>
+    <%= form.text_area :zip_codes_list, value: chapter.persisted? ? chapter.zip_codes_list.join(", ") : "", rows: 3, placeholder: "60601, 60602, 60603", class: "block shadow-sm rounded-md border border-slate-600 focus:outline-indigo-500 px-3 py-2 mt-2 w-full" %>
+    <p class="text-xs text-slate-500 mt-1">People with these zip codes are automatically assigned to this chapter.</p>
   </div>
-  <%= form.submit chapter.persisted? ? "Save" : "Create chapter", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+  <%= form.submit chapter.persisted? ? "Save" : "Create chapter", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
 <% end %>

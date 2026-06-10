@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+html {
+  color-scheme: dark;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-slate-500);
+}
+
+trix-toolbar .trix-button {
+  background-color: var(--color-slate-200);
+}

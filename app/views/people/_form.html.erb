@@ -1,75 +1,75 @@
 <%= form_with model: person, class: "contents" do |form| %>
   <% if person.errors.any? %>
-    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block"><%= person.errors.full_messages.to_sentence %></p>
+    <p class="py-2 px-3 bg-red-500/10 mb-5 text-red-400 font-medium rounded-lg inline-block"><%= person.errors.full_messages.to_sentence %></p>
   <% end %>
 
   <div class="my-5 grid grid-cols-2 gap-4">
     <div>
-      <%= form.label :first_name, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :first_name, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :first_name, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.text_field :first_name, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
     <div>
-      <%= form.label :last_name, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :last_name, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :last_name, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.text_field :last_name, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
   </div>
 
   <div class="my-5 grid grid-cols-2 gap-4">
     <div>
-      <%= form.label :phone, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.telephone_field :phone, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :phone, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.telephone_field :phone, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
     <div>
-      <%= form.label :email, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.email_field :email, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :email, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.email_field :email, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
   </div>
 
   <div class="my-5 grid grid-cols-4 gap-4">
     <div class="col-span-2">
-      <%= form.label :address, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :address, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :address, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.text_field :address, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
     <div>
-      <%= form.label :city, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :city, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <%= form.label :city, class: "block text-sm font-medium text-slate-300" %>
+      <%= form.text_field :city, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
     <div class="grid grid-cols-2 gap-2">
       <div>
-        <%= form.label :state, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.text_field :state, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+        <%= form.label :state, class: "block text-sm font-medium text-slate-300" %>
+        <%= form.text_field :state, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
       </div>
       <div>
-        <%= form.label :zip_code, "Zip", class: "block text-sm font-medium text-gray-700" %>
-        <%= form.text_field :zip_code, class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+        <%= form.label :zip_code, "Zip", class: "block text-sm font-medium text-slate-300" %>
+        <%= form.text_field :zip_code, class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
       </div>
     </div>
   </div>
 
   <div class="my-5">
-    <%= form.label :tag_list, "Tags (comma separated)", class: "block text-sm font-medium text-gray-700" %>
-    <%= form.text_field :tag_list, value: person.persisted? ? person.tag_list : "", class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+    <%= form.label :tag_list, "Tags (comma separated)", class: "block text-sm font-medium text-slate-300" %>
+    <%= form.text_field :tag_list, value: person.persisted? ? person.tag_list : "", class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
   </div>
 
   <% if person.persisted? %>
     <div class="my-5">
-      <%= form.label :primary_chapter_id, "Primary chapter", class: "block text-sm font-medium text-gray-700" %>
-      <%= form.select :primary_chapter_id, current_organization.chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: person.primary_chapter&.id }, { class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full bg-white" } %>
+      <%= form.label :primary_chapter_id, "Primary chapter", class: "block text-sm font-medium text-slate-300" %>
+      <%= form.select :primary_chapter_id, current_organization.chapters.order(:name).map { |c| [ c.name, c.id ] }, { selected: person.primary_chapter&.id }, { class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full bg-slate-800/60" } %>
     </div>
   <% end %>
 
   <% current_organization.custom_fields.order(:label).each do |field| %>
     <div class="my-5">
-      <label class="block text-sm font-medium text-gray-700"><%= field.label %></label>
-      <%= text_field_tag "person[custom_field_values][#{field.key}]", person.custom_field_values[field.key], class: "block shadow-sm rounded-md border border-gray-400 px-3 py-2 mt-2 w-full" %>
+      <label class="block text-sm font-medium text-slate-300"><%= field.label %></label>
+      <%= text_field_tag "person[custom_field_values][#{field.key}]", person.custom_field_values[field.key], class: "block shadow-sm rounded-md border border-slate-600 px-3 py-2 mt-2 w-full" %>
     </div>
   <% end %>
 
   <div class="my-5">
-    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+    <label class="inline-flex items-center gap-2 text-sm text-slate-300">
       <%= form.check_box :do_not_call %> Do not call
     </label>
   </div>
 
-  <%= form.submit person.persisted? ? "Save" : "Create person", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+  <%= form.submit person.persisted? ? "Save" : "Create person", class: "rounded-md px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
 <% end %>

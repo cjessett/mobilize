@@ -5,6 +5,7 @@ class PeopleController < ApplicationController
     @people = Person.visible_to(current_membership).search(params[:q])
     @people = @people.where(id: ChapterMembership.where(chapter_id: params[:chapter_id]).select(:person_id)) if params[:chapter_id].present?
     @people = @people.order(:first_name, :last_name).limit(200).includes(:tags, :chapters)
+    @latest_activity = Activity.where(person_id: @people.map(&:id)).order(:occurred_at).index_by(&:person_id)
   end
 
   def show

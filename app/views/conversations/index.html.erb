@@ -2,18 +2,18 @@
 
 <h1 class="font-bold text-3xl mb-4">Inbox</h1>
 
-<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
   <% if @conversations.empty? %>
-    <p class="p-6 text-gray-500">No conversations yet. Send someone a text from their profile or a blast.</p>
+    <p class="p-6 text-slate-400">No conversations yet. Send someone a text from their profile or a blast.</p>
   <% end %>
   <% @conversations.each do |person, last_message, at| %>
-    <%= link_to conversation_path(person), class: "block p-4 hover:bg-gray-50" do %>
+    <%= link_to conversation_path(person), class: "block p-4 hover:bg-slate-800" do %>
       <div class="flex items-center justify-between">
-        <span class="font-medium text-gray-900"><%= person.name %></span>
-        <span class="text-xs text-gray-400"><%= time_ago_in_words(at) %> ago</span>
+        <span class="font-medium text-slate-100"><%= person.name %></span>
+        <span class="text-xs text-slate-500"><%= time_ago_in_words(at) %> ago</span>
       </div>
-      <div class="text-sm text-gray-500 truncate mt-1">
-        <span class="<%= last_message.direction == 'inbound' ? 'text-blue-700 font-medium' : '' %>">
+      <div class="text-sm text-slate-400 truncate mt-1">
+        <span class="<%= last_message.direction == 'inbound' ? 'text-indigo-400 font-medium' : '' %>">
           <%= last_message.direction == "inbound" ? "←" : "→" %> <%= last_message.body.truncate(100) %>
         </span>
       </div>

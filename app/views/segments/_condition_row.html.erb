@@ -1,34 +1,34 @@
-<div data-condition-row class="flex gap-2 items-center bg-white border border-gray-200 rounded-md p-2">
+<div data-condition-row class="flex gap-2 items-center bg-slate-800/60 border border-slate-700/70 rounded-md p-2">
   <%= select_tag "segment[conditions][][type]",
         options_for_select([ [ "Field", "field" ], [ "Custom field", "custom_field" ], [ "Tag", "tag" ], [ "Chapter", "chapter" ] ], condition["type"]),
-        data: { role: "type", action: "conditions#typeChanged" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white" %>
+        data: { role: "type", action: "conditions#typeChanged" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60" %>
 
   <%= select_tag "segment[conditions][][field]",
         options_for_select(Segment::ALLOWED_FIELDS.map { |f| [ f.humanize, f ] }, condition["field"]),
-        data: { role: "field" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white" %>
+        data: { role: "field" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60" %>
 
   <%= select_tag "segment[conditions][][key]",
         options_for_select(current_organization.custom_fields.order(:label).map { |f| [ f.label, f.key ] }, condition["key"]),
-        data: { role: "key" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white" %>
+        data: { role: "key" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60" %>
 
   <%= select_tag "segment[conditions][][op]",
         options_for_select([ [ "equals", "eq" ], [ "contains", "contains" ], [ "is present", "present" ], [ "is blank", "blank" ] ], condition["op"]),
-        data: { role: "op" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white" %>
+        data: { role: "op" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60" %>
 
   <%= text_field_tag "segment[conditions][][value]", condition["value"], placeholder: "value",
-        data: { role: "value" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white w-40" %>
+        data: { role: "value" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60 w-40" %>
 
   <%= select_tag "segment[conditions][][op]",
         options_for_select([ [ "has tag", "has" ], [ "does not have tag", "not_has" ] ], condition["op"]),
-        data: { role: "tag-op" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white", disabled: true %>
+        data: { role: "tag-op" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60", disabled: true %>
 
   <%= select_tag "segment[conditions][][tag_id]",
         options_for_select(current_organization.tags.order(:name).map { |t| [ t.name, t.id ] }, condition["tag_id"]),
-        data: { role: "tag" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white", disabled: true %>
+        data: { role: "tag" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60", disabled: true %>
 
   <%= select_tag "segment[conditions][][chapter_id]",
         options_for_select(current_organization.chapters.order(:name).map { |c| [ c.name, c.id ] }, condition["chapter_id"]),
-        data: { role: "chapter" }, class: "rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white", disabled: true %>
+        data: { role: "chapter" }, class: "rounded-md border border-slate-600 px-2 py-1.5 text-sm bg-slate-800/60", disabled: true %>
 
-  <button type="button" data-action="conditions#remove" class="ml-auto text-sm text-red-500 hover:underline cursor-pointer">Remove</button>
+  <button type="button" data-action="conditions#remove" class="ml-auto text-sm text-red-400 hover:underline cursor-pointer">Remove</button>
 </div>

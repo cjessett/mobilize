@@ -2,23 +2,23 @@
 
 <div class="flex items-center justify-between mb-4">
   <h1 class="font-bold text-3xl">Text blasts</h1>
-  <%= link_to "New blast", new_blast_path, class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium" %>
+  <%= link_to "New blast", new_blast_path, class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
 </div>
 
-<div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+<div class="bg-slate-800/60 rounded-lg border border-slate-700/70 divide-y divide-slate-700/60">
   <% if @blasts.empty? %>
-    <p class="p-6 text-gray-500">No blasts yet.</p>
+    <p class="p-6 text-slate-400">No blasts yet.</p>
   <% end %>
   <% @blasts.each do |blast| %>
     <div class="p-4 flex items-center justify-between">
       <div>
-        <%= link_to blast.name, blast, class: "font-medium text-blue-700 hover:underline" %>
-        <div class="text-sm text-gray-500 truncate max-w-xl"><%= blast.body.truncate(120) %></div>
+        <%= link_to blast.name, blast, class: "font-medium text-indigo-400 hover:underline" %>
+        <div class="text-sm text-slate-400 truncate max-w-xl"><%= blast.body.truncate(120) %></div>
       </div>
       <div class="text-right">
-        <span class="text-xs rounded-full px-2 py-0.5 <%= { 'draft' => 'bg-gray-100 text-gray-600', 'scheduled' => 'bg-yellow-50 text-yellow-700', 'sending' => 'bg-blue-50 text-blue-700', 'sent' => 'bg-green-50 text-green-700', 'failed' => 'bg-red-50 text-red-600', 'canceled' => 'bg-gray-100 text-gray-400' }[blast.status] %>"><%= blast.status %></span>
+        <span class="text-xs rounded-full px-2 py-0.5 <%= { 'draft' => 'bg-slate-700 text-slate-300', 'scheduled' => 'bg-yellow-500/10 text-yellow-300', 'sending' => 'bg-indigo-500/15 text-indigo-400', 'sent' => 'bg-green-500/10 text-green-400', 'failed' => 'bg-red-500/10 text-red-400', 'canceled' => 'bg-slate-700 text-slate-500' }[blast.status] %>"><%= blast.status %></span>
         <% if blast.scheduled? && blast.scheduled_at %>
-          <div class="text-xs text-gray-400 mt-1"><%= blast.scheduled_at.in_time_zone(current_organization.time_zone).strftime("%b %-d %l:%M %p") %></div>
+          <div class="text-xs text-slate-500 mt-1"><%= blast.scheduled_at.in_time_zone(current_organization.time_zone).strftime("%b %-d %l:%M %p") %></div>
         <% end %>
       </div>
     </div>
