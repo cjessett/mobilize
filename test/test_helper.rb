@@ -15,7 +15,7 @@ module ActiveSupport
     include ActionMailer::TestHelper
 
     # Each test gets a fresh fake SMS provider so deliveries can be asserted.
-    setup { Rails.application.config.x.sms_provider = Sms::FakeProvider.new }
+    setup { Sms.provider = Sms::FakeProvider.new }
 
     def fake_sms = Sms.provider
   end

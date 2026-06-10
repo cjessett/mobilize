@@ -1,23 +1,112 @@
 <%= render "shared/flash" %>
 
-<h1 class="font-bold text-3xl"><%= @organization.name %></h1>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-bold text-3xl"><%= @organization.name %></h1>
+  <%= form_with url: root_path, method: :get, class: "flex gap-2" do |form| %>
+    <%= form.select :chapter_id, [ [ "All chapters", "" ] ] + @chapters.map { |c| [ c.name, c.id ] }, { selected: params[:chapter_id] }, { class: "shadow-sm rounded-md border border-gray-300 px-3 py-2 bg-white text-sm", onchange: "this.form.requestSubmit()" } %>
+  <% end %>
+</div>
 
-<div class="grid md:grid-cols-3 gap-4 mt-6">
+<div class="grid md:grid-cols-4 gap-4">
   <div class="bg-white rounded-lg border border-gray-200 p-5">
     <div class="text-sm text-gray-500">People</div>
     <div class="text-3xl font-bold mt-1"><%= @people_count %></div>
+    <div class="text-xs text-green-600 mt-1">+<%= @new_people_this_month %> in the last 30 days</div>
+    <div class="text-xs text-gray-400 mt-1"><%= @opted_out_count %> SMS opt-outs</div>
   </div>
+
   <div class="bg-white rounded-lg border border-gray-200 p-5">
-    <div class="text-sm text-gray-500">Chapters</div>
-    <div class="text-3xl font-bold mt-1"><%= @chapters.size %></div>
-    <ul class="mt-2 text-sm text-gray-600">
-      <% @chapters.each do |chapter| %>
-        <li><%= chapter.name %><%= " — #{chapter.phone_number}" if chapter.phone_number.present? %></li>
+    <div class="text-sm text-gray-500">Texting</div>
+    <div class="text-3xl font-bold mt-1"><%= @outbound_count %></div>
+    <div class="text-xs text-gray-400 mt-1">
+      <%= @delivered_count %> delivered · <%= @inbound_count %> replies
+      <%= "· #{@reply_rate}% reply rate" if @reply_rate %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <div class="text-sm text-gray-500">Email</div>
+    <div class="text-3xl font-bold mt-1"><%= @email_sent_count %></div>
+    <div class="text-xs text-gray-400 mt-1">
+      <%= @email_opened_count %> opened<%= " · #{@open_rate}% open rate" if @open_rate %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <div class="text-sm text-gray-500">Events</div>
+    <div class="text-3xl font-bold mt-1"><%= @rsvp_count %></div>
+    <div class="text-xs text-gray-400 mt-1">
+      RSVPs<%= " · #{@attendance_rate}% attendance" if @attendance_rate %>
+      · <%= @workflow_runs_count %> workflow runs (30d)
+    </div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6 mt-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <h2 class="font-semibold text-sm text-gray-700 mb-3">New people (last 8 weeks)</h2>
+    <% max = [ @growth.map(&:last).max, 1 ].max %>
+    <div class="flex items-end gap-2 h-32">
+      <% @growth.each do |week, count| %>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <span class="text-xs text-gray-500"><%= count if count.positive? %></span>
+          <div class="w-full bg-blue-500 rounded-t" style="height: <%= [ (count * 100.0 / max).round, count.positive? ? 4 : 1 ].max %>%"></div>
+          <span class="text-[10px] text-gray-400"><%= week.strftime("%-m/%-d") %></span>
+        </div>
       <% end %>
-    </ul>
+    </div>
   </div>
+
   <div class="bg-white rounded-lg border border-gray-200 p-5">
-    <div class="text-sm text-gray-500">Your role</div>
-    <div class="text-3xl font-bold mt-1 capitalize"><%= current_membership&.role %></div>
+    <h2 class="font-semibold text-sm text-gray-700 mb-3">Recent activity</h2>
+    <div class="divide-y divide-gray-100">
+      <% if @recent_activity.empty? %>
+        <p class="text-gray-500 text-sm">No activity yet.</p>
+      <% end %>
+      <% @recent_activity.each do |activity| %>
+        <div class="py-2 flex items-center justify-between text-sm">
+          <div>
+            <%= link_to activity.person.name, activity.person, class: "text-blue-700 hover:underline" %>
+            <span class="text-gray-500"><%= activity.kind.humanize.downcase %></span>
+          </div>
+          <span class="text-xs text-gray-400"><%= time_ago_in_words(activity.occurred_at) %> ago</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6 mt-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <h2 class="font-semibold text-sm text-gray-700 mb-3">Upcoming events</h2>
+    <div class="divide-y divide-gray-100">
+      <% if @upcoming_events.empty? %>
+        <p class="text-gray-500 text-sm">No upcoming events. <%= link_to "Create one", new_event_path, class: "text-blue-700 hover:underline" %></p>
+      <% end %>
+      <% @upcoming_events.each do |event| %>
+        <div class="py-2 flex items-center justify-between text-sm">
+          <%= link_to event.title, event, class: "text-blue-700 hover:underline" %>
+          <span class="text-xs text-gray-400">
+            <%= event.starts_at.in_time_zone(@organization.time_zone).strftime("%b %-d, %l:%M %p") %>
+            · <%= event.yes_rsvps.count %> going
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200 p-5">
+    <h2 class="font-semibold text-sm text-gray-700 mb-3">Scheduled blasts</h2>
+    <div class="divide-y divide-gray-100">
+      <% if @scheduled_blasts.empty? %>
+        <p class="text-gray-500 text-sm">Nothing scheduled. <%= link_to "New blast", new_blast_path, class: "text-blue-700 hover:underline" %></p>
+      <% end %>
+      <% @scheduled_blasts.each do |blast| %>
+        <div class="py-2 flex items-center justify-between text-sm">
+          <%= link_to blast.name, blast, class: "text-blue-700 hover:underline" %>
+          <span class="text-xs text-gray-400"><%= blast.scheduled_at&.in_time_zone(@organization.time_zone)&.strftime("%b %-d, %l:%M %p") %></span>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

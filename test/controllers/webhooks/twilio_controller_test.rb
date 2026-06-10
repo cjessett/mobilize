@@ -14,7 +14,7 @@ class Webhooks::TwilioControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "rejects invalid signatures" do
-    Rails.application.config.x.sms_provider = Class.new do
+    Sms.provider = Class.new do
       def valid_webhook?(*) = false
     end.new
 
