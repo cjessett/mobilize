@@ -29,7 +29,7 @@ class Event < ApplicationRecord
     rsvps.find_by(person: person) || begin
       rsvp = rsvps.create!(person: person, status: full? ? "waitlist" : "yes")
       Activity.record!(person: person, kind: "rsvp_created", subject: rsvp, data: { "event" => title })
-      Workflow.fire(trigger: "rsvp_created", person: person, param: id)
+      Workflow.fire(trigger: "rsvp_created", person: person, param: id, payload: { status: rsvp.status })
       rsvp
     end
   end

@@ -1,0 +1,25 @@
+<%= form_with model: template, class: "contents" do |form| %>
+  <% if template.errors.any? %>
+    <p class="py-2 px-3 bg-red-500/10 mt-4 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= template.errors.full_messages.to_sentence %></p>
+  <% end %>
+
+  <%= form_card do %>
+    <%= form_row "Template name" do %>
+      <%= form.text_field :name, required: true, class: ui_input %>
+    <% end %>
+
+    <%= form_row "Subject", hint: "Merge tags work here too." do %>
+      <%= form.text_field :subject, required: true, class: ui_input %>
+    <% end %>
+
+    <%= form_row "Body", hint: "Merge tags: {{first_name}}, {{last_name}}, {{name}}, {{chapter_name}}." do %>
+      <div class="rounded-md border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 [&_trix-editor]:min-h-48 [&_trix-editor]:px-3 [&_trix-editor]:py-2">
+        <%= form.rich_text_area :body %>
+      </div>
+    <% end %>
+
+    <%= form_actions do %>
+      <%= form.submit template.persisted? ? "Save Template" : "Create Template", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+    <% end %>
+  <% end %>
+<% end %>

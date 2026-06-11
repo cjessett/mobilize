@@ -6,6 +6,8 @@ class Message < ApplicationRecord
   belongs_to :person
   belongs_to :chapter, optional: true
   belongs_to :blast, optional: true
+  has_many :short_links, dependent: :nullify
+  has_many_attached :media
 
   validates :direction, inclusion: { in: DIRECTIONS }
   validates :status, inclusion: { in: STATUSES }
@@ -16,16 +18,24 @@ class Message < ApplicationRecord
 
   after_create_commit :broadcast_to_conversation, :record_activity
 
-  def self.compose!(person:, body:, blast: nil)
-    create!(
+  def self.compose!(person:, body:, blast: nil, media: [], respect_texting_hours: false)
+    send_after = DeliveryWindow.next_allowed_time(person: person, organization: person.organization) if respect_texting_hours
+    message = create!(
       organization_id: person.organization_id,
       person: person,
       chapter: person.primary_chapter,
       blast: blast,
       direction: "outbound",
       body: MergeTags.render(body, person),
-      status: "pending"
+      status: "pending",
+      send_after: send_after
     )
+    message.media.attach(media) if media.present?
+    if blast
+      shortened = LinkShortener.rewrite(message.body, organization: message.organization, blast: blast, message: message, person: person)
+      message.update!(body: shortened) if shortened != message.body
+    end
+    message
   end
 
   def deliver_later

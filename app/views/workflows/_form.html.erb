@@ -1,4 +1,4 @@
-<%= form_with model: workflow, class: "contents", data: { controller: "steps" } do |form| %>
+<%= form_with model: workflow, class: "contents", data: { controller: "steps triggers", action: "submit->steps#reindex" } do |form| %>
   <% if workflow.errors.any? %>
     <p class="py-2 px-3 bg-red-500/10 mt-4 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= workflow.errors.full_messages.to_sentence %></p>
   <% end %>
@@ -8,14 +8,27 @@
       <%= form.text_field :name, required: true, class: ui_input %>
     <% end %>
 
-    <%= form_row "Trigger", hint: "When this happens, the workflow runs for that person." do %>
-      <%= form.select :trigger,
-            [ [ "Keyword received", "keyword_received" ], [ "Tag added", "tag_added" ], [ "Form submitted", "form_submitted" ], [ "Event RSVP", "rsvp_created" ], [ "Donation received", "donation_created" ] ],
-            {}, { class: ui_input } %>
+    <%= form_row "Triggers", hint: "Any of these events enrolls the person. Each person runs through a workflow once — remove their run from their profile to re-enroll them." do %>
+      <div data-triggers-target="rows" class="space-y-2">
+        <% workflow.workflow_triggers.each do |t| %>
+          <%= render "trigger_row", trigger: { "trigger" => t.trigger, "param" => t.param }.merge(t.config) %>
+        <% end %>
+      </div>
+
+      <template data-triggers-target="template">
+        <%= render "trigger_row", trigger: {} %>
+      </template>
+
+      <button type="button" data-action="triggers#add" class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add trigger</button>
     <% end %>
 
-    <%= form_row "Matching", hint: "Keyword, tag name, or form slug to match. Leave blank to match any." do %>
-      <%= form.text_field :trigger_param, class: ui_input %>
+    <%= form_row "Goal", hint: "When this happens for an enrolled person, they exit the workflow early — remaining steps are skipped. Optional param narrows the match (form slug, event id, blast id…)." do %>
+      <div class="flex flex-wrap gap-2">
+        <%= form.select :goal_trigger,
+              [ [ "No goal", "" ], [ "Replies by text", "incoming_text" ], [ "Submits a form", "form_submitted" ], [ "RSVPs to an event", "rsvp_created" ], [ "Attends an event", "event_attended" ], [ "Makes a donation", "donation_created" ], [ "Clicks a link", "link_clicked" ] ],
+              {}, { class: ui_input + " !w-64" } %>
+        <%= form.text_field :goal_param, placeholder: "param (blank = any)", class: ui_input + " !w-56" %>
+      </div>
     <% end %>
 
     <%= form_row "Scope" do %>
@@ -27,15 +40,21 @@
             class: ui_input %>
     <% end %>
 
-    <%= form_row "Steps", hint: "Run in order from top to bottom." do %>
+    <%= form_row "Steps", hint: "Run in order from top to bottom. A router step branches on which list (segment) the person is in; a branch with no list is the \"everyone else\" branch." do %>
       <div data-steps-target="rows" class="space-y-2">
-        <% workflow.workflow_steps.each do |step| %>
-          <%= render "step_row", step: step.params.merge("action" => step.action) %>
+        <% workflow.step_tree.each do |step| %>
+          <%= render "step_row", step: step %>
         <% end %>
       </div>
 
       <template data-steps-target="template">
         <%= render "step_row", step: {} %>
+      </template>
+      <template data-steps-target="branchTemplate">
+        <%= render "branch_row", branch: {} %>
+      </template>
+      <template data-steps-target="nestedTemplate">
+        <%= render "step_row", step: {}, nested: true %>
       </template>
 
       <button type="button" data-action="steps#add" class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add step</button>

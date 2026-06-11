@@ -7,6 +7,13 @@
   </div>
 
   <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 mb-4">
+    <% if @blast.media.attached? %>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <% @blast.media.each do |attachment| %>
+          <%= image_tag attachment, class: "h-24 w-24 object-cover rounded-md border border-gray-200 dark:border-slate-700" %>
+        <% end %>
+      </div>
+    <% end %>
     <div class="text-sm whitespace-pre-wrap"><%= @blast.body %></div>
     <div class="text-xs text-gray-400 dark:text-slate-500 mt-3">
       Audience: <%= @blast.segment&.name || "Everyone" %>
@@ -21,6 +28,22 @@
         <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 px-4 py-2 text-center">
           <div class="text-lg font-bold"><%= count %></div>
           <div class="text-xs text-gray-500 dark:text-slate-400"><%= status %></div>
+        </div>
+      <% end %>
+      <% if @blast.has_links? %>
+        <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 px-4 py-2 text-center">
+          <div class="text-lg font-bold"><%= @blast.unique_clickers %></div>
+          <div class="text-xs text-gray-500 dark:text-slate-400">clicked a link</div>
+        </div>
+        <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 px-4 py-2 text-center">
+          <div class="text-lg font-bold"><%= @blast.total_clicks %></div>
+          <div class="text-xs text-gray-500 dark:text-slate-400">total clicks</div>
+        </div>
+      <% end %>
+      <% if (submissions = @blast.attributed_submissions) > 0 %>
+        <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 px-4 py-2 text-center">
+          <div class="text-lg font-bold"><%= submissions %></div>
+          <div class="text-xs text-gray-500 dark:text-slate-400">form submissions</div>
         </div>
       <% end %>
     </div>
@@ -42,6 +65,19 @@
         <%= button_to "Cancel schedule", cancel_blast_path(@blast), method: :post, class: "rounded-md px-3.5 py-2.5 border border-red-500/40 text-red-600 dark:text-red-400 bg-white dark:bg-slate-800/60 hover:bg-red-500/10 font-medium cursor-pointer" %>
       <% end %>
       <%= link_to "Edit", edit_blast_path(@blast), class: "rounded-md px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium" %>
+      <%= button_to "Clone", clone_blast_path(@blast), method: :post, class: "rounded-md px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium cursor-pointer" %>
+    </div>
+
+    <%= form_with url: test_send_blast_path(@blast), method: :post, class: "mt-4 flex flex-wrap gap-2 items-end" do |form| %>
+      <div>
+        <label class="block text-xs text-gray-500 dark:text-slate-400">Send a test to (your phone)</label>
+        <%= form.telephone_field :phone, placeholder: "(555) 555-5555", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 mt-1 bg-gray-50 dark:bg-slate-900/70 w-64" %>
+      </div>
+      <%= form.submit "Send test", class: "rounded-md px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium cursor-pointer" %>
+    <% end %>
+  <% else %>
+    <div class="flex gap-2">
+      <%= button_to "Clone", clone_blast_path(@blast), method: :post, class: "rounded-md px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium cursor-pointer" %>
     </div>
   <% end %>
 </div>

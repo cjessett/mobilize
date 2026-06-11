@@ -8,10 +8,10 @@ module Sms
       @deliveries = []
     end
 
-    def send_message(to:, body:, from: nil, status_callback: nil)
-      delivery = { to: to, from: from, body: body, sid: "FAKE#{SecureRandom.hex(16)}" }
+    def send_message(to:, body:, from: nil, media_urls: [], status_callback: nil)
+      delivery = { to: to, from: from, body: body, media_urls: media_urls, sid: "FAKE#{SecureRandom.hex(16)}" }
       @deliveries << delivery
-      Rails.logger.info("[FakeSms] to=#{to} from=#{from} body=#{body.truncate(120)}")
+      Rails.logger.info("[FakeSms] to=#{to} from=#{from} media=#{media_urls.size} body=#{body.truncate(120)}")
       Result.new(sid: delivery[:sid], status: "sent")
     end
 

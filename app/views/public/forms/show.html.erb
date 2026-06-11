@@ -21,6 +21,7 @@
 <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-5 mt-6">
   <h2 class="font-semibold text-lg mb-3"><%= @form.petition? ? "Add your name" : "Sign up" %></h2>
   <%= form_with url: public_submit_form_path(@organization.slug, @form.slug), method: :post, class: "contents" do |f| %>
+    <%= hidden_field_tag :mb, params[:mb] if params[:mb].present? %>
     <div class="grid md:grid-cols-2 gap-3">
       <% @form.form_fields.each do |field| %>
         <div>

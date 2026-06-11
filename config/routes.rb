@@ -25,9 +25,12 @@ Rails.application.routes.draw do
       post :send_now
       post :schedule
       post :cancel
+      post :clone
+      post :test_send
     end
   end
   resources :sms_templates, except: :show
+  resources :email_templates, except: :show
   resources :email_blasts do
     member do
       post :send_now
@@ -40,6 +43,8 @@ Rails.application.routes.draw do
       post :toggle
     end
   end
+  resources :workflow_runs, only: :destroy
+  get "l/:token", to: "short_links#show", as: :short_link
   get "unsubscribe/:token", to: "email_tracking#unsubscribe", as: :unsubscribe
   get "email/open/:token", to: "email_tracking#open", as: :email_open
   resources :keywords, only: [ :index, :create, :destroy ]
@@ -62,9 +67,12 @@ Rails.application.routes.draw do
     post "f/:slug", to: "forms#submit", as: :submit_form
   end
 
+  resources :donations, only: [ :index, :new, :create ]
+
   namespace :webhooks do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"
+    post "donations/:token", to: "donations#create", as: :donations
   end
 
   namespace :settings do

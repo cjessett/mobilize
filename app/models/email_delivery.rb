@@ -9,6 +9,9 @@ class EmailDelivery < ApplicationRecord
   generates_token_for :open_tracking
 
   def mark_opened!
-    update!(opened_at: Time.current) if opened_at.nil?
+    return if opened_at.present?
+
+    update!(opened_at: Time.current)
+    Workflow.fire(trigger: "email_opened", person: person, param: email_blast_id)
   end
 end

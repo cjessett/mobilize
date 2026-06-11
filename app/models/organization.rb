@@ -16,6 +16,8 @@ class Organization < ApplicationRecord
   has_many :workflows, dependent: :destroy
   has_many :events, dependent: :destroy
   has_many :forms, dependent: :destroy
+  has_many :donations, dependent: :destroy
+  has_many :email_templates, dependent: :destroy
 
   def chapter_for_phone_number(number)
     chapters.find_by(phone_number: PhoneNumber.normalize(number))
@@ -30,6 +32,12 @@ class Organization < ApplicationRecord
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name } + ActiveSupport::TimeZone.all.map(&:name) }
 
   before_validation :generate_slug, on: :create
+
+  # Authenticates inbound webhooks (e.g. donation notifications).
+  def webhook_token!
+    update!(webhook_token: SecureRandom.hex(16)) if webhook_token.blank?
+    webhook_token
+  end
 
   def default_chapter
     chapters.find_by(default: true) || chapters.first

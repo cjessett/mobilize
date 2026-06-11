@@ -1,0 +1,41 @@
+<%= render "shared/flash" %>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Donations</h1>
+  <%= link_to "Record Donation", new_donation_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+</div>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70 mb-6">
+  <div class="overflow-x-auto">
+  <table class="w-full text-left min-w-[40rem]">
+    <thead>
+      <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+        <th class="px-6 py-4 font-semibold">Person</th>
+        <th class="px-4 py-4 font-semibold">Amount</th>
+        <th class="px-4 py-4 font-semibold">Source</th>
+        <th class="px-4 py-4 font-semibold">Date</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% if @donations.empty? %>
+        <tr><td colspan="4" class="px-6 py-8 text-gray-500 dark:text-slate-400">No donations yet.</td></tr>
+      <% end %>
+      <% @donations.each do |donation| %>
+        <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><%= link_to donation.person.name, donation.person, class: "hover:underline" %></td>
+          <td class="px-4 py-4 text-sm"><%= number_to_currency(donation.amount) %></td>
+          <td class="px-4 py-4 text-sm text-gray-500 dark:text-slate-400"><%= donation.source %></td>
+          <td class="px-4 py-4 text-sm text-gray-500 dark:text-slate-400"><%= donation.donated_at.in_time_zone(current_organization.time_zone).strftime("%b %-d, %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70 p-5 text-sm text-gray-500 dark:text-slate-400">
+  <h2 class="font-semibold text-gray-900 dark:text-white mb-1">Donation webhook</h2>
+  <p>POST donations from your payment processor to:</p>
+  <code class="block mt-2 text-xs bg-gray-100 dark:bg-slate-900/70 rounded p-2 break-all"><%= webhooks_donations_url(token: @webhook_token) %></code>
+  <p class="mt-2">JSON body: <code>phone</code> or <code>email</code>, <code>first_name</code>, <code>last_name</code>, <code>amount_cents</code>, <code>source</code>, <code>donated_at</code>.</p>
+</div>

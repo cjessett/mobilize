@@ -25,14 +25,16 @@ Mirrors [Solidarity Tech's core concepts](https://www.solidarity.tech/docs/solid
 | Pillar | What's included |
 |---|---|
 | CRM | People CRUD, CSV import, tags, notes, custom fields, activity feed, segment builder |
-| Texting | Two-way inbox (live via Turbo Streams), templates, keywords with auto-replies, blasts (now/scheduled), STOP/START opt-out, delivery stats |
-| Email | Rich-text blasts to segments, open tracking, unsubscribe links, scheduling |
+| Texting | Two-way inbox (live via Turbo Streams), MMS attachments, templates (global + per-event, with a picker in the inbox and workflows), keywords with auto-replies, STOP/START opt-out |
+| Text blasts | Now/scheduled sends, live character/segment counter with cost estimate, test sends, clone, per-language message variants, link shortening with per-recipient click tracking and form-submission attribution, texting-hours compliance (queue/skip/override, recipient-timezone aware), delivery + click stats |
+| Email | Rich-text blasts to segments, email templates, open tracking, unsubscribe links, scheduling |
 | Events | Public RSVP pages, capacity/waitlists, 24h SMS reminders, check-in |
 | Forms | Signup forms & petitions with goals, public pages, submissions upsert people |
-| Automations | Workflows triggered by keywords, tags, form submissions, RSVPs; steps: SMS, email, tag, wait, notify |
+| Donations | Manual entry plus a tokenized webhook for payment processors; feeds the donation automation trigger |
+| Automations | Multiple triggers per workflow (keyword, tag, form, RSVP w/ status filter, attendance, donation, link click, email open, person created, incoming text with contains/exact/regex filter); actions: SMS, email, tag/untag, wait, notify member (email or SMS), update property, webhook, RSVP to event; decision router with list-based branches (first-match or all-matches, "everyone else" branch, nested steps); once-per-person enrollment with manual re-enroll; goals that exit runs early; per-step reach counts and goal rate |
 | Reporting | Dashboard with per-chapter filtering: growth, reply rates, open rates, attendance |
 
-Deferred for now: browser calling/phonebanks, payments (Stripe donations/dues).
+Deferred for now: browser calling/phonebanks, real payment processing (donations are records only), AI translation of message variants.
 
 ## Getting started
 
@@ -66,6 +68,11 @@ demoable locally. Emails open in the browser via letter_opener.
   sign it, and watch the "Welcome new signers" workflow tag + text the signer.
 - **Events**: `/o/riverside-united/events` → RSVP, then check people in from
   the admin event page.
+- **Donation webhook**: the Donations page shows your org's webhook URL — POST
+  `{ "phone": "...", "amount_cents": 2500, "source": "actblue" }` to it and the
+  donation appears, firing any donation-triggered automations.
+- **Link tracking**: send a blast whose body contains a URL — each recipient
+  gets a unique short link, and clicks show up on the blast page.
 
 ## Twilio setup (real SMS)
 
@@ -79,6 +86,12 @@ demoable locally. Emails open in the browser via letter_opener.
    - Status callback: `POST https://<host>/webhooks/twilio/sms_status`
 
 Webhook signatures are validated automatically when Twilio credentials are set.
+Inbound MMS arrives through the same webhook — media is downloaded and attached
+to the conversation.
+
+In production also set **`APP_HOST`** (e.g. `app.example.org`) — it's used to
+build short links, MMS media URLs, and Twilio status callbacks. Development
+falls back to `localhost:3000`.
 
 For email, configure SMTP via Action Mailer in production (e.g. Resend, SES)
 and set `MAIL_FROM`.

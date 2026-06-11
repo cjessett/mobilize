@@ -1,5 +1,5 @@
 class BlastsController < ApplicationController
-  before_action :set_blast, only: [ :show, :edit, :update, :destroy, :send_now, :schedule, :cancel ]
+  before_action :set_blast, only: [ :show, :edit, :update, :destroy, :send_now, :schedule, :cancel, :clone, :test_send ]
 
   def index
     @blasts = Blast.visible_to(current_membership).order(created_at: :desc)
@@ -12,7 +12,10 @@ class BlastsController < ApplicationController
 
   def new
     @blast = current_organization.blasts.new(access_scope: current_organization)
-    @blast.body = current_organization.sms_templates.find_by(id: params[:template_id])&.body if params[:template_id]
+    if params[:template_id] && (template = current_organization.sms_templates.find_by(id: params[:template_id]))
+      @blast.body = template.body
+      @blast.variants = template.variants
+    end
   end
 
   def create
@@ -61,6 +64,31 @@ class BlastsController < ApplicationController
     redirect_to @blast, notice: "Blast canceled."
   end
 
+  def clone
+    copy = current_organization.blasts.create!(
+      name: "#{@blast.name} (copy)",
+      body: @blast.body,
+      segment_id: @blast.segment_id,
+      access_scope: @blast.access_scope,
+      status: "draft"
+    )
+    copy.media.attach(@blast.media.blobs) if @blast.media.attached?
+    redirect_to edit_blast_path(copy), notice: "Blast cloned."
+  end
+
+  def test_send
+    phone = PhoneNumber.normalize(params[:phone])
+    return redirect_to(@blast, alert: "Enter a valid phone number for the test.") unless PhoneNumber.valid?(phone)
+
+    sample = current_organization.people.where.not(phone: nil).first || current_organization.people.first
+    body = sample ? MergeTags.render(@blast.body, sample) : @blast.body
+    from = current_organization.chapters.find_by(default: true)&.phone_number
+    Sms.provider.send_message(to: phone, body: body, from: from)
+    redirect_to @blast, notice: "Test message sent to #{PhoneNumber.format(phone)}."
+  rescue Sms::Error => e
+    redirect_to @blast, alert: "Test send failed: #{e.message}"
+  end
+
   private
 
   def set_blast
@@ -68,7 +96,9 @@ class BlastsController < ApplicationController
   end
 
   def blast_params
-    permitted = params.require(:blast).permit(:name, :body, :segment_id, :access_scope_gid)
+    permitted = params.require(:blast).permit(:name, :body, :segment_id, :access_scope_gid, :texting_hours_mode, media: [], variants: {})
+    permitted[:media] = Array(permitted[:media]).compact_blank
+    permitted.delete(:media) if permitted[:media].empty?
     scope = case permitted.delete(:access_scope_gid)
     when /\Achapter-(\d+)\z/ then current_organization.chapters.find($1)
     else current_organization

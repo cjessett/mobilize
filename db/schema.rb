@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -76,7 +76,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.integer "segment_id"
     t.datetime "sent_at"
     t.string "status", default: "draft", null: false
+    t.string "texting_hours_mode", default: "queue", null: false
     t.datetime "updated_at", null: false
+    t.json "variants", default: {}, null: false
     t.index ["access_scope_type", "access_scope_id"], name: "index_blasts_on_access_scope"
     t.index ["organization_id"], name: "index_blasts_on_organization_id"
     t.index ["segment_id"], name: "index_blasts_on_segment_id"
@@ -124,6 +126,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.index ["organization_id"], name: "index_custom_fields_on_organization_id"
   end
 
+  create_table "donations", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "usd", null: false
+    t.datetime "donated_at", null: false
+    t.integer "organization_id", null: false
+    t.integer "person_id", null: false
+    t.string "source"
+    t.datetime "updated_at", null: false
+    t.index ["organization_id", "donated_at"], name: "index_donations_on_organization_id_and_donated_at"
+    t.index ["organization_id"], name: "index_donations_on_organization_id"
+    t.index ["person_id"], name: "index_donations_on_person_id"
+  end
+
   create_table "email_blasts", force: :cascade do |t|
     t.integer "access_scope_id", null: false
     t.string "access_scope_type", null: false
@@ -152,6 +168,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.index ["email_blast_id", "person_id"], name: "index_email_deliveries_on_email_blast_id_and_person_id", unique: true
     t.index ["email_blast_id"], name: "index_email_deliveries_on_email_blast_id"
     t.index ["person_id"], name: "index_email_deliveries_on_person_id"
+  end
+
+  create_table "email_templates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_email_templates_on_organization_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -217,6 +242,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.index ["tag_id"], name: "index_keywords_on_tag_id"
   end
 
+  create_table "link_clicks", force: :cascade do |t|
+    t.datetime "clicked_at", null: false
+    t.datetime "created_at", null: false
+    t.string "ip"
+    t.integer "short_link_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["short_link_id"], name: "index_link_clicks_on_short_link_id"
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.integer "access_scope_id", null: false
     t.string "access_scope_type", null: false
@@ -241,6 +276,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.integer "organization_id", null: false
     t.integer "person_id", null: false
     t.string "provider_sid"
+    t.datetime "send_after"
     t.datetime "sent_at"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
@@ -267,10 +303,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.string "name", null: false
     t.integer "parent_id"
     t.string "slug", null: false
+    t.json "texting_days", default: [0, 1, 2, 3, 4, 5, 6], null: false
+    t.integer "texting_hours_end", default: 21, null: false
+    t.integer "texting_hours_start", default: 9, null: false
     t.string "time_zone", default: "UTC", null: false
     t.datetime "updated_at", null: false
+    t.string "webhook_token"
     t.index ["parent_id"], name: "index_organizations_on_parent_id"
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
+    t.index ["webhook_token"], name: "index_organizations_on_webhook_token", unique: true
   end
 
   create_table "people", force: :cascade do |t|
@@ -328,12 +369,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "short_links", force: :cascade do |t|
+    t.integer "blast_id"
+    t.datetime "created_at", null: false
+    t.string "destination_url", null: false
+    t.integer "message_id"
+    t.integer "organization_id", null: false
+    t.integer "person_id"
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blast_id"], name: "index_short_links_on_blast_id"
+    t.index ["message_id"], name: "index_short_links_on_message_id"
+    t.index ["organization_id"], name: "index_short_links_on_organization_id"
+    t.index ["person_id"], name: "index_short_links_on_person_id"
+    t.index ["token"], name: "index_short_links_on_token", unique: true
+  end
+
   create_table "sms_templates", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.integer "event_id"
     t.string "name", null: false
     t.integer "organization_id", null: false
     t.datetime "updated_at", null: false
+    t.json "variants", default: {}, null: false
+    t.index ["event_id"], name: "index_sms_templates_on_event_id"
     t.index ["organization_id"], name: "index_sms_templates_on_organization_id"
   end
 
@@ -342,9 +402,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.json "data", default: {}, null: false
     t.integer "form_id", null: false
     t.integer "person_id", null: false
+    t.integer "source_blast_id"
     t.datetime "updated_at", null: false
     t.index ["form_id"], name: "index_submissions_on_form_id"
     t.index ["person_id"], name: "index_submissions_on_person_id"
+    t.index ["source_blast_id"], name: "index_submissions_on_source_blast_id"
   end
 
   create_table "taggings", force: :cascade do |t|
@@ -377,27 +439,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
   end
 
   create_table "workflow_runs", force: :cascade do |t|
+    t.json "context", default: {}, null: false
     t.datetime "created_at", null: false
     t.integer "current_position", default: 0, null: false
+    t.integer "current_step_id"
     t.string "error_message"
     t.datetime "finished_at"
+    t.datetime "goal_achieved_at"
     t.integer "person_id", null: false
     t.string "status", default: "running", null: false
     t.datetime "updated_at", null: false
     t.integer "workflow_id", null: false
+    t.index ["current_step_id"], name: "index_workflow_runs_on_current_step_id"
     t.index ["person_id"], name: "index_workflow_runs_on_person_id"
+    t.index ["workflow_id", "person_id"], name: "index_workflow_runs_on_workflow_id_and_person_id", unique: true
     t.index ["workflow_id"], name: "index_workflow_runs_on_workflow_id"
+  end
+
+  create_table "workflow_step_executions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "executed_at", null: false
+    t.integer "person_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "workflow_run_id", null: false
+    t.integer "workflow_step_id", null: false
+    t.index ["person_id"], name: "index_workflow_step_executions_on_person_id"
+    t.index ["workflow_run_id"], name: "index_workflow_step_executions_on_workflow_run_id"
+    t.index ["workflow_step_id"], name: "index_workflow_step_executions_on_workflow_step_id"
   end
 
   create_table "workflow_steps", force: :cascade do |t|
     t.string "action", null: false
+    t.integer "branch_index"
     t.datetime "created_at", null: false
     t.json "params", default: {}, null: false
+    t.integer "parent_step_id"
     t.integer "position", null: false
     t.datetime "updated_at", null: false
     t.integer "workflow_id", null: false
-    t.index ["workflow_id", "position"], name: "index_workflow_steps_on_workflow_id_and_position", unique: true
+    t.index ["parent_step_id"], name: "index_workflow_steps_on_parent_step_id"
+    t.index ["workflow_id", "parent_step_id", "branch_index", "position"], name: "idx_on_workflow_id_parent_step_id_branch_index_posi_006d65a797"
     t.index ["workflow_id"], name: "index_workflow_steps_on_workflow_id"
+  end
+
+  create_table "workflow_triggers", force: :cascade do |t|
+    t.json "config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "param"
+    t.string "trigger", null: false
+    t.datetime "updated_at", null: false
+    t.integer "workflow_id", null: false
+    t.index ["trigger"], name: "index_workflow_triggers_on_trigger"
+    t.index ["workflow_id"], name: "index_workflow_triggers_on_workflow_id"
   end
 
   create_table "workflows", force: :cascade do |t|
@@ -405,9 +498,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
     t.string "access_scope_type", null: false
     t.datetime "created_at", null: false
     t.boolean "enabled", default: true, null: false
+    t.string "goal_param"
+    t.string "goal_trigger"
     t.string "name", null: false
     t.integer "organization_id", null: false
-    t.string "trigger", null: false
+    t.string "trigger"
     t.string "trigger_param"
     t.datetime "updated_at", null: false
     t.index ["access_scope_type", "access_scope_id"], name: "index_workflows_on_access_scope"
@@ -426,10 +521,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
   add_foreign_key "chapter_zip_codes", "chapters"
   add_foreign_key "chapters", "organizations"
   add_foreign_key "custom_fields", "organizations"
+  add_foreign_key "donations", "organizations"
+  add_foreign_key "donations", "people"
   add_foreign_key "email_blasts", "organizations"
   add_foreign_key "email_blasts", "segments"
   add_foreign_key "email_deliveries", "email_blasts"
   add_foreign_key "email_deliveries", "people"
+  add_foreign_key "email_templates", "organizations"
   add_foreign_key "events", "organizations"
   add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "form_fields", "forms"
@@ -437,6 +535,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
   add_foreign_key "forms", "tags", column: "apply_tag_id"
   add_foreign_key "keywords", "organizations"
   add_foreign_key "keywords", "tags"
+  add_foreign_key "link_clicks", "short_links"
   add_foreign_key "memberships", "organizations"
   add_foreign_key "memberships", "users"
   add_foreign_key "messages", "blasts"
@@ -451,6 +550,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
   add_foreign_key "rsvps", "people"
   add_foreign_key "segments", "organizations"
   add_foreign_key "sessions", "users"
+  add_foreign_key "short_links", "blasts"
+  add_foreign_key "short_links", "messages"
+  add_foreign_key "short_links", "organizations"
+  add_foreign_key "short_links", "people"
+  add_foreign_key "sms_templates", "events"
   add_foreign_key "sms_templates", "organizations"
   add_foreign_key "submissions", "forms"
   add_foreign_key "submissions", "people"
@@ -459,7 +563,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_10_070000) do
   add_foreign_key "tags", "organizations"
   add_foreign_key "users", "people"
   add_foreign_key "workflow_runs", "people"
+  add_foreign_key "workflow_runs", "workflow_steps", column: "current_step_id"
   add_foreign_key "workflow_runs", "workflows"
+  add_foreign_key "workflow_step_executions", "people"
+  add_foreign_key "workflow_step_executions", "workflow_runs"
+  add_foreign_key "workflow_step_executions", "workflow_steps"
+  add_foreign_key "workflow_steps", "workflow_steps", column: "parent_step_id"
   add_foreign_key "workflow_steps", "workflows"
+  add_foreign_key "workflow_triggers", "workflows"
   add_foreign_key "workflows", "organizations"
 end

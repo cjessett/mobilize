@@ -51,6 +51,22 @@
   </div>
 
   <div>
+    <% runs = @person.workflow_runs.includes(:workflow).order(created_at: :desc) %>
+    <% if runs.any? %>
+      <h2 class="font-semibold text-lg mb-2">Automations</h2>
+      <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60 mb-6">
+        <% runs.each do |run| %>
+          <div class="p-3 flex items-center justify-between gap-2 text-sm">
+            <div class="min-w-0">
+              <%= link_to run.workflow.name, run.workflow, class: "text-indigo-600 dark:text-indigo-400 hover:underline" %>
+              <span class="text-xs text-gray-400 dark:text-slate-500">· <%= run.status %></span>
+            </div>
+            <%= button_to "Remove", workflow_run_path(run), method: :delete, data: { turbo_confirm: "Remove this enrollment so they can run through \"#{run.workflow.name}\" again?" }, class: "text-xs text-red-600 dark:text-red-400 hover:underline cursor-pointer shrink-0" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <h2 class="font-semibold text-lg mb-2">Add note</h2>
     <%= form_with model: [ @person, @note ], class: "contents" do |form| %>
       <%= form.text_area :body, rows: 3, class: "block shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 w-full bg-white dark:bg-slate-800/60" %>

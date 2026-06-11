@@ -1,0 +1,17 @@
+<div data-branch-row class="border border-dashed border-gray-300 dark:border-slate-600 rounded-md p-2 ml-4">
+  <div class="flex flex-wrap gap-2 items-center">
+    <%= text_field_tag nil, branch["name"], placeholder: "Branch name",
+          data: { branch_field: "name" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-44" %>
+    <%= select_tag nil,
+          options_for_select([ [ "Everyone (else branch)", "" ] ] + Segment.visible_to(current_membership).order(:name).map { |s| [ "In list: #{s.name}", s.id ] }, branch["segment_id"]),
+          data: { branch_field: "segment_id" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+    <button type="button" data-action="steps#removeBranch" class="ml-auto text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer">Remove branch</button>
+  </div>
+
+  <div data-branch-steps class="space-y-2 mt-2 ml-4">
+    <% Array(branch["steps"]).each do |nested_step| %>
+      <%= render "step_row", step: nested_step, nested: true %>
+    <% end %>
+  </div>
+  <button type="button" data-action="steps#addNestedStep" class="mt-2 ml-4 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add step to branch</button>
+</div>

@@ -19,6 +19,23 @@
         <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: ui_input } %>
       <% end %>
 
+      <%= form_row "Texting hours", hint: "Texts outside this window are held until it next opens, based on each recipient's state (approximate) or the org time zone." do %>
+        <% hour_options = (0..23).map { |h| [ Time.zone.parse("#{h}:00").strftime("%-l:00 %p"), h ] } %>
+        <div class="flex items-center gap-2">
+          <%= form.select :texting_hours_start, hour_options, {}, { class: ui_input + " !w-36" } %>
+          <span class="text-sm text-gray-500 dark:text-slate-400">to</span>
+          <%= form.select :texting_hours_end, hour_options, {}, { class: ui_input + " !w-36" } %>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-3">
+          <% Date::ABBR_DAYNAMES.each_with_index do |day, wday| %>
+            <label class="flex items-center gap-1.5 text-sm text-gray-700 dark:text-slate-300">
+              <%= check_box_tag "organization[texting_days][]", wday, Array(@organization.texting_days).map(&:to_i).include?(wday) %>
+              <%= day %>
+            </label>
+          <% end %>
+        </div>
+      <% end %>
+
       <%= form_actions do %>
         <%= form.submit "Save Settings", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
       <% end %>

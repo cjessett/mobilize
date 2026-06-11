@@ -9,7 +9,19 @@
     <% end %>
 
     <%= form_row "Message", hint: "Merge tags: {{first_name}}, {{last_name}}, {{name}}, {{chapter_name}}." do %>
-      <%= form.text_area :body, rows: 5, required: true, class: ui_input %>
+      <div data-controller="sms-counter">
+        <%= form.text_area :body, rows: 5, required: true, class: ui_input,
+              data: { sms_counter_target: "input", action: "input->sms-counter#update" } %>
+        <p class="text-xs text-gray-400 dark:text-slate-500 mt-1.5" data-sms-counter-target="output"></p>
+      </div>
+    <% end %>
+
+    <%= form_row "Translations", hint: "Optional per-language versions of the message." do %>
+      <%= render "shared/language_variants", record: template, param_name: "sms_template" %>
+    <% end %>
+
+    <%= form_row "Event", hint: "Event templates only appear when working in that event's context. Leave blank for a global template." do %>
+      <%= form.collection_select :event_id, current_organization.events.order(starts_at: :desc), :id, :title, { include_blank: "Global (all contexts)" }, { class: ui_input } %>
     <% end %>
 
     <%= form_actions do %>

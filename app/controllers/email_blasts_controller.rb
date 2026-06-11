@@ -12,6 +12,10 @@ class EmailBlastsController < ApplicationController
 
   def new
     @email_blast = current_organization.email_blasts.new(access_scope: current_organization)
+    if params[:email_template_id] && (template = current_organization.email_templates.find_by(id: params[:email_template_id]))
+      @email_blast.subject = template.subject
+      @email_blast.body = template.body.body
+    end
   end
 
   def create

@@ -15,7 +15,7 @@ class Public::FormsController < Public::BaseController
       redirect_to public_form_path(@organization.slug, @form.slug), alert: "Please provide a phone number or email." and return
     end
 
-    @form.submit!(values)
+    @form.submit!(values, source_blast_id: params[:mb].presence)
     redirect_to public_form_path(@organization.slug, @form.slug), notice: @form.confirmation_message.presence || "Thanks — you're in!"
   rescue ActiveRecord::RecordInvalid => e
     redirect_to public_form_path(@organization.slug, @form.slug), alert: e.record.errors.full_messages.to_sentence

@@ -2,6 +2,7 @@ require "test_helper"
 
 class BlastSendJobTest < ActiveJob::TestCase
   setup do
+    travel_to Time.utc(2026, 6, 10, 17, 0) # noon Chicago, inside texting hours
     @org = organizations(:riverside)
     @blast = @org.blasts.create!(name: "Test", body: "Hi {{first_name}}!", access_scope: @org, status: "scheduled")
   end
@@ -31,6 +32,26 @@ class BlastSendJobTest < ActiveJob::TestCase
     @blast.update!(status: "canceled")
     Blast::SendJob.perform_now(@blast)
     assert_empty @blast.messages
+  end
+
+  test "blast media is sent as MMS urls" do
+    @blast.media.attach(io: file_fixture("pixel.png").open, filename: "pixel.png", content_type: "image/png")
+    perform_enqueued_jobs { Blast::SendJob.perform_now(@blast) }
+
+    maria_message = @blast.messages.find_by(person: people(:maria))
+    assert maria_message.media.attached?
+    delivery = fake_sms.deliveries.find { |d| d[:to] == people(:maria).phone }
+    assert_equal 1, delivery[:media_urls].size
+    assert_match %r{http://www\.example\.com/rails/active_storage}, delivery[:media_urls].first
+  end
+
+  test "recipients get their preferred language variant" do
+    people(:maria).update!(preferred_language: "Spanish")
+    @blast.update!(variants: { "es" => { "body" => "¡Hola {{first_name}}!" } })
+    perform_enqueued_jobs { Blast::SendJob.perform_now(@blast) }
+
+    assert_equal "¡Hola Maria!", @blast.messages.find_by(person: people(:maria)).body
+    assert_equal "Hi Alex!", @blast.messages.find_by(person: people(:admin_person)).body
   end
 
   test "segment audience limits recipients" do

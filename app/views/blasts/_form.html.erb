@@ -9,7 +9,26 @@
     <% end %>
 
     <%= form_row "Message", hint: "Merge tags: {{first_name}}, {{last_name}}, {{name}}, {{chapter_name}}, or any custom field key." do %>
-      <%= form.text_area :body, rows: 5, required: true, class: ui_input %>
+      <div data-controller="sms-counter">
+        <%= form.text_area :body, rows: 5, required: true, class: ui_input,
+              data: { sms_counter_target: "input", action: "input->sms-counter#update" } %>
+        <p class="text-xs text-gray-400 dark:text-slate-500 mt-1.5" data-sms-counter-target="output"></p>
+      </div>
+    <% end %>
+
+    <%= form_row "Translations", hint: "Optional per-language versions. Recipients whose preferred language matches get that version; everyone else gets the default message." do %>
+      <%= render "shared/language_variants", record: blast, param_name: "blast" %>
+    <% end %>
+
+    <%= form_row "Media", hint: "Optional images sent as MMS (up to 10, 5MB each)." do %>
+      <%= form.file_field :media, multiple: true, accept: Blast::MEDIA_TYPES.join(","), class: "block w-full text-sm text-gray-500 dark:text-slate-400" %>
+      <% if blast.media.attached? %>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <% blast.media.each do |attachment| %>
+            <%= image_tag attachment, class: "h-16 w-16 object-cover rounded-md border border-gray-200 dark:border-slate-700" %>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
 
     <%= form_row "Audience" do %>
@@ -23,6 +42,12 @@
               blast.access_scope.is_a?(Chapter) ? "chapter-#{blast.access_scope_id}" : "organization"
             ),
             class: ui_input %>
+    <% end %>
+
+    <%= form_row "Texting hours", hint: "What to do with recipients whose local time is outside the organization's texting hours when the blast sends." do %>
+      <%= form.select :texting_hours_mode,
+            [ [ "Queue until their window opens", "queue" ], [ "Skip them", "skip" ], [ "Send anyway (override)", "override" ] ],
+            {}, { class: ui_input } %>
     <% end %>
 
     <%= form_actions do %>

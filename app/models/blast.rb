@@ -1,13 +1,21 @@
 class Blast < ApplicationRecord
   include Scopable
+  include LanguageVariants
 
   STATUSES = %w[draft scheduled sending sent failed canceled].freeze
 
+  MAX_MEDIA = 10
+  MAX_MEDIA_BYTES = 5.megabytes
+  MEDIA_TYPES = %w[image/jpeg image/png image/gif image/webp].freeze
+
   belongs_to :segment, optional: true
   has_many :messages, dependent: :nullify
+  has_many :short_links, dependent: :nullify
+  has_many_attached :media
 
   validates :name, :body, presence: true
   validates :status, inclusion: { in: STATUSES }
+  validate :validate_media
 
   def recipients
     base = segment ? segment.people : organization.people
@@ -28,7 +36,31 @@ class Blast < ApplicationRecord
     messages.group(:status).count
   end
 
+  def total_clicks
+    LinkClick.joins(:short_link).where(short_links: { blast_id: id }).count
+  end
+
+  def unique_clickers
+    ShortLink.where(blast_id: id).joins(:link_clicks).distinct.count(:person_id)
+  end
+
+  def attributed_submissions
+    Submission.where(source_blast_id: id).count
+  end
+
+  def has_links? = ShortLink.exists?(blast_id: id)
+
   def draft? = status == "draft"
   def scheduled? = status == "scheduled"
   def editable? = %w[draft scheduled canceled].include?(status)
+
+  private
+
+  def validate_media
+    errors.add(:media, "can include at most #{MAX_MEDIA} files") if media.size > MAX_MEDIA
+    media.blobs.each do |blob|
+      errors.add(:media, "must be images (JPEG, PNG, GIF, or WebP)") unless MEDIA_TYPES.include?(blob.content_type)
+      errors.add(:media, "files must be 5MB or smaller") if blob.byte_size > MAX_MEDIA_BYTES
+    end
+  end
 end

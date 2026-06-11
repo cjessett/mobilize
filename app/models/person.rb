@@ -9,6 +9,8 @@ class Person < ApplicationRecord
   has_many :activities, dependent: :destroy
   has_many :messages, dependent: :destroy
   has_many :email_deliveries, dependent: :destroy
+  has_many :donations, dependent: :destroy
+  has_many :workflow_runs, dependent: :destroy
 
   generates_token_for :unsubscribe
 
@@ -38,6 +40,7 @@ class Person < ApplicationRecord
   validate :phone_or_email_present
 
   after_create :assign_primary_chapter
+  after_create_commit { Workflow.fire(trigger: "person_created", person: self) }
 
   def name
     [ first_name, last_name ].compact_blank.join(" ").presence || PhoneNumber.format(phone) || email

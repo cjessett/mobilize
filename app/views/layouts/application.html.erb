@@ -70,6 +70,7 @@
           </div>
 
           <%= sidebar_link "Events", events_path, icon: :flag, active: controller_name == "events" %>
+          <%= sidebar_link "Donations", donations_path, icon: :chart, active: controller_name == "donations" %>
           <%= sidebar_link "Pages", forms_path, icon: :box, active: controller_name == "forms" %>
           <%= sidebar_link "Automations", workflows_path, icon: :bolt, active: controller_name == "workflows" %>
 
@@ -81,7 +82,11 @@
               <%= sidebar_sublink "Templates", sms_templates_path, active: controller_name == "sms_templates" %>
               <%= sidebar_sublink "Keywords", keywords_path, active: controller_name == "keywords" %>
             </div>
-            <%= sidebar_link "Email", email_blasts_path, icon: :mail, active: controller_name == "email_blasts" %>
+            <%= sidebar_link "Email", email_blasts_path, icon: :mail, active: %w[email_blasts email_templates].include?(controller_name) %>
+            <div class="mb-2">
+              <%= sidebar_sublink "Blasts", email_blasts_path, active: controller_name == "email_blasts" %>
+              <%= sidebar_sublink "Templates", email_templates_path, active: controller_name == "email_templates" %>
+            </div>
           </div>
 
           <div class="mt-4 pt-4 border-t border-gray-200 dark:border-slate-800">

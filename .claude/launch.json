@@ -3,9 +3,10 @@
   "configurations": [
     {
       "name": "mobilize",
-      "runtimeExecutable": "bin/rails",
-      "runtimeArgs": ["server", "-p", "3000"],
-      "port": 3000
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.rbenv/shims:$PATH\"; exec bin/rails server --pid /tmp/mobilize-preview.pid"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

@@ -6,7 +6,7 @@ class SmsTemplatesController < ApplicationController
   end
 
   def new
-    @template = current_organization.sms_templates.new
+    @template = current_organization.sms_templates.new(event_id: params[:event_id])
   end
 
   def create
@@ -41,6 +41,6 @@ class SmsTemplatesController < ApplicationController
   end
 
   def template_params
-    params.require(:sms_template).permit(:name, :body)
+    params.require(:sms_template).permit(:name, :body, :event_id, variants: {})
   end
 end

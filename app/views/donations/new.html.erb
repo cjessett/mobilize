@@ -1,0 +1,28 @@
+<%= back_link "Donations", donations_path %>
+<h1 class="font-bold text-3xl text-gray-900 dark:text-white mt-2">Record Donation</h1>
+
+<div class="mx-auto md:w-2/3 w-full">
+  <%= form_with model: @donation, class: "contents" do |form| %>
+    <% if @donation.errors.any? %>
+      <p class="py-2 px-3 bg-red-500/10 mt-4 text-red-600 dark:text-red-400 font-medium rounded-lg inline-block"><%= @donation.errors.full_messages.to_sentence %></p>
+    <% end %>
+
+    <%= form_card do %>
+      <%= form_row "Person" do %>
+        <%= form.collection_select :person_id, current_organization.people.order(:first_name, :last_name), :id, :name, { selected: @donation.person_id }, { class: ui_input, required: true } %>
+      <% end %>
+
+      <%= form_row "Amount", hint: "In dollars." do %>
+        <%= form.number_field :amount, value: (@donation.amount_cents.to_i > 0 ? @donation.amount : nil), step: 0.01, min: 0.01, required: true, class: ui_input %>
+      <% end %>
+
+      <%= form_row "Source", hint: "Donation page or campaign name. Automations can match on this." do %>
+        <%= form.text_field :source, class: ui_input %>
+      <% end %>
+
+      <%= form_actions do %>
+        <%= form.submit "Record Donation", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

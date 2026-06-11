@@ -25,7 +25,7 @@
         <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
           <td class="px-6 py-4"><%= link_to workflow.name, workflow, class: "font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-300" %></td>
           <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300">
-            <%= workflow.trigger.humanize %><%= " (#{workflow.trigger_param})" if workflow.trigger_param.present? %>
+            <%= workflow.workflow_triggers.map { |t| t.trigger.humanize + (t.param.present? ? " (#{t.param})" : "") }.join(", ") %>
           </td>
           <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= workflow.workflow_steps.size %></td>
           <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= workflow.workflow_runs.count %></td>

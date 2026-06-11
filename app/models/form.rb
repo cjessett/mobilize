@@ -46,9 +46,9 @@ class Form < ApplicationRecord
     attrs
   end
 
-  def submit!(values)
+  def submit!(values, source_blast_id: nil)
     person = PersonUpsert.new(organization, person_attributes_from(values)).call
-    submission = submissions.create!(person: person, data: values.slice(*form_fields.map(&:key)))
+    submission = submissions.create!(person: person, data: values.slice(*form_fields.map(&:key)), source_blast_id: source_blast_id)
     person.taggings.find_or_create_by!(tag: apply_tag) if apply_tag
     Activity.record!(person: person, kind: "form_submitted", subject: submission, data: { "form" => title })
     Workflow.fire(trigger: "form_submitted", person: person, param: slug)

@@ -3,11 +3,15 @@ class Webhooks::TwilioController < ActionController::Base
   before_action :validate_signature
 
   def inbound_sms
+    media = (0...params[:NumMedia].to_i).map do |i|
+      { url: params[:"MediaUrl#{i}"], content_type: params[:"MediaContentType#{i}"] }
+    end
     InboundSms.new(
       to: params[:To],
       from: params[:From],
       body: params[:Body],
-      provider_sid: params[:MessageSid]
+      provider_sid: params[:MessageSid],
+      media: media
     ).call
     render xml: "<Response></Response>"
   end

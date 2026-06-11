@@ -1,0 +1,8 @@
+<div class="flex gap-3 items-baseline">
+  <span class="text-xs text-gray-400 dark:text-slate-500 font-mono"><%= label %></span>
+  <div class="min-w-0">
+    <span class="font-medium"><%= step["action"].humanize %></span>
+    <span class="text-sm text-gray-500 dark:text-slate-400"><%= step.except("action", "id", "branches").map { |k, v| "#{k}: #{v.to_s.truncate(80)}" }.join(" · ") %></span>
+  </div>
+  <span class="ml-auto text-xs text-gray-400 dark:text-slate-500 whitespace-nowrap"><%= pluralize(step_counts.fetch(step["id"], 0), "person") %> reached</span>
+</div>

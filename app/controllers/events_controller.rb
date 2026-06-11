@@ -43,6 +43,10 @@ class EventsController < ApplicationController
   def check_in
     rsvp = @event.rsvps.find(params[:rsvp_id])
     rsvp.update!(attended: !rsvp.attended?)
+    if rsvp.attended?
+      Activity.record!(person: rsvp.person, kind: "event_attended", subject: rsvp, data: { "event" => @event.title })
+      Workflow.fire(trigger: "event_attended", person: rsvp.person, param: @event.id)
+    end
     redirect_to @event
   end
 

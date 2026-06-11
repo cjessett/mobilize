@@ -1,0 +1,14 @@
+<%# Per-language overrides for a record with a variants JSON column.
+    locals: record, param_name (e.g. "blast"), field (default "body") %>
+<% field = local_assigns.fetch(:field, "body") %>
+<div class="space-y-2">
+  <% LanguageVariants::LANGUAGES.each do |code, label| %>
+    <% value = record.variants.is_a?(Hash) ? record.variants.dig(code, field) : nil %>
+    <details <%= "open" if value.present? %> class="rounded-md border border-gray-200 dark:border-slate-700/70">
+      <summary class="cursor-pointer px-3 py-2 text-sm text-gray-600 dark:text-slate-300 select-none"><%= label %><%= " ✓" if value.present? %></summary>
+      <div class="px-3 pb-3">
+        <%= text_area_tag "#{param_name}[variants][#{code}][#{field}]", value, rows: 3, class: ui_input %>
+      </div>
+    </details>
+  <% end %>
+</div>

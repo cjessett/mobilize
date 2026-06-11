@@ -17,7 +17,8 @@ class ConversationsController < ApplicationController
     elsif person.opted_out_sms?
       redirect_to conversation_path(person), alert: "This person has opted out of SMS."
     else
-      Message.compose!(person: person, body: body).deliver_later
+      media = Array(params[:message][:media]).compact_blank
+      Message.compose!(person: person, body: body, media: media).deliver_later
       redirect_to conversation_path(person)
     end
   end

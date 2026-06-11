@@ -32,9 +32,23 @@
       <% if @person.opted_out_sms? %>
         <p class="text-sm text-red-600 dark:text-red-400">This person has opted out of SMS.</p>
       <% else %>
-        <%= form_with url: reply_conversation_path(@person), method: :post, class: "flex items-end gap-3" do |form| %>
-          <%= form.text_area "message[body]", rows: 2, placeholder: "Message…", class: "flex-1 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 px-3 py-2 resize-none focus:outline-indigo-500" %>
-          <%= form.submit "Send", class: "rounded-lg px-5 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+        <%= form_with url: reply_conversation_path(@person), method: :post, data: { controller: "template-picker sms-counter" }, class: "space-y-2" do |form| %>
+          <% templates = current_organization.sms_templates.global.order(:name) %>
+          <% if templates.any? %>
+            <%= select_tag "", options_for_select([ [ "Insert template…", "" ] ] + templates.map { |t| [ t.name, t.id, { data: { body: t.body } } ] }),
+                  data: { action: "change->template-picker#apply" },
+                  class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 text-gray-500 dark:text-slate-400" %>
+          <% end %>
+          <div class="flex items-end gap-3">
+            <%= form.text_area "message[body]", rows: 2, placeholder: "Message…",
+                  data: { template_picker_target: "body", sms_counter_target: "input", action: "input->sms-counter#update" },
+                  class: "flex-1 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/70 px-3 py-2 resize-none focus:outline-indigo-500" %>
+            <%= form.submit "Send", class: "rounded-lg px-5 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <%= form.file_field "message[media]", multiple: true, accept: Blast::MEDIA_TYPES.join(","), class: "text-xs text-gray-400 dark:text-slate-500" %>
+            <p class="text-xs text-gray-400 dark:text-slate-500" data-sms-counter-target="output"></p>
+          </div>
         <% end %>
       <% end %>
     </div>

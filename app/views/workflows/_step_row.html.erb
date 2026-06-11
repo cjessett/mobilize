@@ -1,13 +1,22 @@
-<div data-step-row class="flex flex-wrap gap-2 items-start bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/70 rounded-md p-2">
+<% nested = local_assigns.fetch(:nested, false) %>
+<% actions = [ [ "Send SMS", "send_sms" ], [ "Send email", "send_email" ], [ "Add tag", "add_tag" ], [ "Remove tag", "remove_tag" ], [ "Wait", "wait" ], [ "Notify member", "notify_member" ], [ "Update property", "update_custom_field" ], [ "Webhook", "webhook" ], [ "RSVP to event", "rsvp_person_to_event" ] ] %>
+<% actions += [ [ "Router (branch)", "router" ] ] unless nested %>
+<div data-step-row data-controller="template-picker sms-counter" class="flex flex-wrap gap-2 items-start bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/70 rounded-md p-2">
   <%= select_tag "workflow[steps][][action]",
-        options_for_select([ [ "Send SMS", "send_sms" ], [ "Send email", "send_email" ], [ "Add tag", "add_tag" ], [ "Remove tag", "remove_tag" ], [ "Wait", "wait" ], [ "Notify member", "notify_member" ] ], step["action"]),
+        options_for_select(actions, step["action"]),
         data: { role: "action", action: "steps#actionChanged" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+
+  <%= select_tag "", options_for_select([ [ "Insert template…", "" ] ] + current_organization.sms_templates.global.order(:name).map { |t| [ t.name, t.id, { data: { body: t.body } } ] }),
+        data: { role: "sms_template", action: "change->template-picker#apply" },
+        class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 text-gray-500 dark:text-slate-400" %>
 
   <%= text_field_tag "workflow[steps][][subject]", step["subject"], placeholder: "Email subject",
         data: { role: "subject" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-48" %>
 
   <%= text_area_tag "workflow[steps][][body]", step["body"], placeholder: "Message… ({{first_name}} works here)", rows: 2,
-        data: { role: "body" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 flex-1" %>
+        data: { role: "body", template_picker_target: "body", sms_counter_target: "input", action: "input->sms-counter#update" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 flex-1" %>
+
+  <p data-role="body_meta" data-sms-counter-target="output" class="basis-full text-xs text-gray-400 dark:text-slate-500"></p>
 
   <%= text_field_tag "workflow[steps][][tag_name]", step["tag_name"], placeholder: "tag name",
         data: { role: "tag_name" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-36" %>
@@ -18,5 +27,37 @@
   <%= email_field_tag "workflow[steps][][email]", step["email"], placeholder: "member email",
         data: { role: "email" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-52" %>
 
+  <%= select_tag "workflow[steps][][channel]",
+        options_for_select([ [ "Notify by email", "email" ], [ "Notify by SMS", "sms" ] ], step["channel"]),
+        data: { role: "channel" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+
+  <%= text_field_tag "workflow[steps][][key]", step["key"], placeholder: "property key",
+        data: { role: "key" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-40" %>
+
+  <%= text_field_tag "workflow[steps][][value]", step["value"], placeholder: "value",
+        data: { role: "value" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-40" %>
+
+  <%= url_field_tag "workflow[steps][][url]", step["url"], placeholder: "https://example.com/hook",
+        data: { role: "url" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-72" %>
+
+  <%= select_tag "workflow[steps][][event_id]",
+        options_for_select(current_organization.events.order(starts_at: :desc).map { |e| [ e.title, e.id ] }, step["event_id"]),
+        data: { role: "event_id" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+
+  <%= select_tag "workflow[steps][][mode]",
+        options_for_select([ [ "First matching branch only", "first_match" ], [ "Every matching branch in order", "all_matches" ] ], step["mode"]),
+        data: { role: "mode" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+
   <button type="button" data-action="steps#remove" class="ml-auto text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer mt-1.5">Remove</button>
+
+  <% unless nested %>
+    <div data-role="branches" class="basis-full">
+      <div data-branches-rows class="space-y-2">
+        <% Array(step["branches"]).each do |branch| %>
+          <%= render "branch_row", branch: branch %>
+        <% end %>
+      </div>
+      <button type="button" data-action="steps#addBranch" class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">+ Add branch</button>
+    </div>
+  <% end %>
 </div>
