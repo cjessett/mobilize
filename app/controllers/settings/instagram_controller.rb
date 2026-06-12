@@ -76,7 +76,7 @@ class Settings::InstagramController < ApplicationController
   private
 
   def callback_url
-    settings_instagram_callback_url(host: request.host_with_port, protocol: request.protocol)
+    callback_settings_instagram_index_url(host: request.host_with_port, protocol: request.protocol)
   end
 
   def save_page(page)
