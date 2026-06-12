@@ -1,0 +1,26 @@
+<h1 class="font-bold text-3xl"><%= @event.title %></h1>
+<p class="text-gray-500 dark:text-slate-400 mt-1">Host tools — check people in as they arrive. This page needs no login; keep the link private.</p>
+
+<% @sessions.each do |session| %>
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 mt-6">
+    <div class="px-4 py-3 border-b border-gray-200 dark:border-slate-700/70">
+      <span class="font-semibold"><%= session.display_title %></span>
+      <span class="text-sm text-gray-500 dark:text-slate-400">· <%= "#{session.yes_rsvps.count} going" %></span>
+    </div>
+    <div class="divide-y divide-gray-200 dark:divide-slate-700/60">
+      <% session.rsvps.sort_by { |r| r.person.name.to_s } .each do |rsvp| %>
+        <div class="p-3 flex items-center justify-between gap-3">
+          <div class="min-w-0 text-sm">
+            <span class="font-medium"><%= rsvp.person.name %></span>
+            <span class="text-xs text-gray-400 dark:text-slate-500 ml-1"><%= rsvp.status %></span>
+            <div class="text-xs text-gray-500 dark:text-slate-400"><%= [ rsvp.person.display_phone, rsvp.person.email ].compact_blank.join(" · ") %></div>
+          </div>
+          <%= button_to rsvp.attended? ? "✓ Attended" : "Check in", host_tools_check_in_path(token: @event.host_token, rsvp_id: rsvp.id), method: :post, class: "text-sm rounded-md px-3 py-1.5 cursor-pointer shrink-0 #{rsvp.attended? ? 'bg-green-600 text-white' : 'border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700'}" %>
+        </div>
+      <% end %>
+      <% if session.rsvps.empty? %>
+        <p class="p-3 text-sm text-gray-500 dark:text-slate-400">No RSVPs yet.</p>
+      <% end %>
+    </div>
+  </div>
+<% end %>

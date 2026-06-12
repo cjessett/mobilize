@@ -1,14 +1,21 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [ :show, :edit, :update, :destroy, :check_in ]
+  before_action :set_event, only: [ :show, :edit, :update, :destroy, :check_in, :clone, :approve ]
 
   def index
-    @tab = params[:tab] == "past" ? "past" : "upcoming"
-    events = Event.visible_to(current_membership)
-    @events = @tab == "past" ? events.past.limit(50) : events.upcoming
+    @tab = %w[past pending].include?(params[:tab]) ? params[:tab] : "upcoming"
+    events = accessible_events
+    @pending_count = events.where(approved: false).count
+    @events = case @tab
+    when "past" then events.approved.past.limit(50)
+    when "pending" then events.where(approved: false).order(created_at: :desc)
+    else events.approved.upcoming
+    end
+    @events = @events.select { |e| e.tags.include?(params[:tag]) } if params[:tag].present?
   end
 
   def show
-    @rsvps = @event.rsvps.includes(:person).order(:created_at)
+    @sessions = @event.event_sessions
+    @rsvps = @event.rsvps.includes(:person, :event_session).order(:created_at)
   end
 
   def new
@@ -42,22 +49,54 @@ class EventsController < ApplicationController
 
   def check_in
     rsvp = @event.rsvps.find(params[:rsvp_id])
-    rsvp.update!(attended: !rsvp.attended?)
-    if rsvp.attended?
-      Activity.record!(person: rsvp.person, kind: "event_attended", subject: rsvp, data: { "event" => @event.title })
-      Workflow.fire(trigger: "event_attended", person: rsvp.person, param: @event.id)
-    end
+    @event.check_in!(rsvp)
     redirect_to @event
+  end
+
+  def clone
+    copy = current_organization.events.create!(
+      @event.slice(:title, :description, :event_type, :location, :virtual_url, :capacity,
+        :unlisted, :tag_list, :invited_segment_id, :time_zone, :reminder_body, :variants,
+        :confirmation_days_before, :starts_at, :ends_at)
+        .merge(title: "#{@event.title} (copy)", access_scope: @event.access_scope)
+    )
+    @event.sms_templates.find_each { |t| copy.sms_templates.create!(t.slice(:name, :body, :variants).merge(organization: current_organization)) }
+    redirect_to edit_event_path(copy), notice: "Event cloned."
+  end
+
+  def approve
+    @event.update!(approved: true)
+    EventMailer.host_approved(@event).deliver_later if @event.submitted_by&.email.present?
+    redirect_to @event, notice: "Event approved and published."
+  end
+
+  def redeem_cohost
+    event = Event.find_by(cohost_code: params[:code].to_s.strip.presence)
+    if event.nil? || event.organization_id == current_organization.id
+      redirect_to events_path, alert: "That co-host code doesn't match any event."
+    else
+      event.event_co_hosts.find_or_create_by!(organization: current_organization)
+      redirect_to event, notice: "You're now co-hosting \"#{event.title}\". RSVPs and attendance are shared."
+    end
   end
 
   private
 
+  def accessible_events
+    own = Event.visible_to(current_membership).select(:id)
+    cohosted = EventCoHost.where(organization: current_organization).select(:event_id)
+    Event.where(id: own).or(Event.where(id: cohosted))
+  end
+
   def set_event
-    @event = Event.visible_to(current_membership).find(params[:id])
+    @event = accessible_events.find(params[:id])
   end
 
   def event_attributes
-    permitted = params.require(:event).permit(:title, :description, :event_type, :starts_at, :ends_at, :location, :virtual_url, :capacity, :access_scope_gid)
+    permitted = params.require(:event).permit(:title, :description, :event_type, :starts_at, :ends_at,
+      :location, :virtual_url, :capacity, :access_scope_gid, :unlisted, :tag_list, :invited_segment_id,
+      :time_zone, :reminder_body, :confirmation_days_before, :recurrence_frequency, :recurrence_until,
+      :recurrence_days_ahead, variants: {})
     scope = case permitted.delete(:access_scope_gid)
     when /\Achapter-(\d+)\z/ then current_organization.chapters.find($1)
     else current_organization

@@ -52,8 +52,18 @@ Rails.application.routes.draw do
   resources :events do
     member do
       post :check_in
+      post :clone
+      post :approve
     end
+    collection do
+      post :redeem_cohost
+    end
+    resources :event_sessions, only: [ :create, :destroy ], shallow: true
   end
+  get "host/:token", to: "host_tools#show", as: :host_tools
+  post "host/:token/check_in/:rsvp_id", to: "host_tools#check_in", as: :host_tools_check_in
+  get "rsvp/confirm/:token", to: "rsvp_confirmations#show", as: :rsvp_confirmation
+  get "calendar/:org_slug", to: "public/calendars#feed", as: :calendar_feed, defaults: { format: "ics" }
 
   resources :forms
 
@@ -61,8 +71,11 @@ Rails.application.routes.draw do
     resources :events, only: [ :index, :show ] do
       member do
         post :rsvp
+        get :calendar, defaults: { format: "ics" }
       end
     end
+    get "host-an-event", to: "event_submissions#new", as: :host_an_event
+    post "host-an-event", to: "event_submissions#create"
     get "f/:slug", to: "forms#show", as: :form
     post "f/:slug", to: "forms#submit", as: :submit_form
   end
@@ -73,6 +86,7 @@ Rails.application.routes.draw do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"
     post "donations/:token", to: "donations#create", as: :donations
+    post "attendance/:token", to: "attendance#create", as: :attendance
   end
 
   namespace :settings do

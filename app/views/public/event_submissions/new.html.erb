@@ -1,0 +1,18 @@
+<h1 class="font-bold text-3xl">Host an event</h1>
+<p class="text-gray-500 dark:text-slate-400 mt-1">Propose your own event for <%= @organization.name %>. We'll review it and email you host tools once it's approved.</p>
+
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-5 mt-6">
+  <%= form_with url: public_host_an_event_path(@organization.slug), method: :post, class: "contents" do |form| %>
+    <div class="grid md:grid-cols-2 gap-3">
+      <%= form.text_field :title, placeholder: "Event title", required: true, class: "md:col-span-2 shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.text_field :starts_at, placeholder: "Date and time", required: true, data: { controller: "datepicker" }, class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.text_field :location, placeholder: "Location", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.text_area :description, placeholder: "What's the plan?", rows: 3, class: "md:col-span-2 shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.text_field :first_name, placeholder: "Your first name", required: true, class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.text_field :last_name, placeholder: "Your last name", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.telephone_field :phone, placeholder: "Phone", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+      <%= form.email_field :email, placeholder: "Email", class: "shadow-sm rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60" %>
+    </div>
+    <%= form.submit "Submit event for approval", class: "mt-4 rounded-md px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium cursor-pointer" %>
+  <% end %>
+</div>

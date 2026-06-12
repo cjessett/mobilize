@@ -2,13 +2,22 @@
 
 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
   <h1 class="font-bold text-3xl text-gray-900 dark:text-white">All Events</h1>
-  <%= link_to "Create New Event", new_event_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+  <div class="flex gap-2 items-center flex-wrap">
+    <%= form_with url: redeem_cohost_events_path, method: :post, class: "flex gap-2" do |form| %>
+      <%= form.text_field :code, placeholder: "Co-host code", class: "rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm w-36" %>
+      <%= form.submit "Redeem", class: "rounded-md px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
+    <% end %>
+    <%= link_to "Create New Event", new_event_path, class: "rounded-md px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+  </div>
 </div>
 
 <div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
   <div class="flex gap-6 md:gap-8 px-4 md:px-6 pt-5 border-b border-gray-200 dark:border-slate-700/70 overflow-x-auto">
     <%= tab_link "Active & Upcoming Events", events_path, active: @tab == "upcoming" %>
     <%= tab_link "Past Events", events_path(tab: "past"), active: @tab == "past" %>
+    <% if @pending_count > 0 %>
+      <%= tab_link "Pending Approval (#{@pending_count})", events_path(tab: "pending"), active: @tab == "pending" %>
+    <% end %>
   </div>
 
   <div class="overflow-x-auto">
@@ -38,10 +47,12 @@
           <td class="px-4 py-4 text-sm text-gray-700 dark:text-slate-300"><%= event.rsvps.where(attended: true).count %></td>
           <td class="px-4 py-4 text-sm text-gray-400 dark:text-slate-500"><%= event.starts_at.in_time_zone(current_organization.time_zone).strftime("%b %-d, %-l:%M%P") %></td>
           <td class="px-4 py-4">
-            <% if @tab == "past" %>
+            <% if @tab == "pending" %>
+              <%= status_pill "Pending", :yellow %>
+            <% elsif @tab == "past" %>
               <%= status_pill "Past", :gray %>
             <% else %>
-              <%= status_pill "Upcoming", :green %>
+              <%= status_pill event.unlisted? ? "Unlisted" : "Upcoming", event.unlisted? ? :gray : :green %>
             <% end %>
           </td>
         </tr>
