@@ -5,11 +5,10 @@ class Instagram::OauthService
   GRAPH_URL = "https://graph.facebook.com/v21.0"
   DIALOG_URL = "https://www.facebook.com/v21.0/dialog/oauth"
   SCOPES = %w[
+    instagram_basic
     instagram_manage_messages
     instagram_manage_comments
-    pages_messaging
     pages_show_list
-    pages_read_engagement
   ].join(",").freeze
 
   def self.auth_url(redirect_uri:, state:)
