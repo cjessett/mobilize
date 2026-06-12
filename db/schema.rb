@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_040356) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_041844) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -302,6 +302,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_040356) do
     t.datetime "created_at", null: false
     t.string "instagram_access_token"
     t.string "instagram_page_id"
+    t.string "instagram_username"
     t.string "name", null: false
     t.integer "parent_id"
     t.string "slug", null: false

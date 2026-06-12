@@ -17,7 +17,7 @@ class Settings::OrganizationsController < ApplicationController
   private
 
   def organization_params
-    permitted = params.require(:organization).permit(:name, :slug, :time_zone, :texting_hours_start, :texting_hours_end, :instagram_page_id, :instagram_access_token, texting_days: [])
+    permitted = params.require(:organization).permit(:name, :slug, :time_zone, :texting_hours_start, :texting_hours_end, texting_days: [])
     permitted[:texting_days] = Array(permitted[:texting_days]).compact_blank.map(&:to_i) if permitted.key?(:texting_days)
     permitted
   end
