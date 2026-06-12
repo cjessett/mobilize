@@ -25,5 +25,10 @@
         options_for_select([ [ "Any RSVP status", "" ], [ "Yes", "yes" ], [ "Waitlist", "waitlist" ], [ "Canceled", "canceled" ] ], trigger["status"]),
         data: { role: "status" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
 
+  <% post_url_value = trigger["post_shortcode"].present? ? Instagram::Shortcode.to_url(trigger["post_shortcode"]) : trigger["post_url"] %>
+  <%= url_field_tag "workflow[triggers][][post_url]", post_url_value,
+        placeholder: "https://www.instagram.com/p/… (blank = any post)",
+        data: { role: "post_url" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-80" %>
+
   <button type="button" data-action="triggers#remove" class="ml-auto text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer mt-1.5">Remove</button>
 </div>
