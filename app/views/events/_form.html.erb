@@ -48,6 +48,49 @@
       <%= form.text_area :description, rows: 4, class: ui_input %>
     <% end %>
 
+    <%= form_row "Repeats", hint: "Future sessions are generated automatically on a rolling basis. Extra sessions can also be added one-off from the event page." do %>
+      <div class="flex flex-wrap items-center gap-2">
+        <%= form.select :recurrence_frequency,
+              [ [ "Does not repeat", "none" ], [ "Daily", "daily" ], [ "Weekly", "weekly" ], [ "Monthly", "monthly" ] ],
+              {}, { class: ui_input + " !w-44" } %>
+        <span class="text-sm text-gray-500 dark:text-slate-400">generate</span>
+        <%= form.number_field :recurrence_days_ahead, min: 1, class: ui_input + " !w-24" %>
+        <span class="text-sm text-gray-500 dark:text-slate-400">days ahead, until</span>
+        <%= form.date_field :recurrence_until, class: ui_input + " !w-44" %>
+      </div>
+    <% end %>
+
+    <%= form_row "Event time zone", hint: "Defaults to the organization time zone. Used on the public page, reminders, and calendar invites." do %>
+      <%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, { include_blank: "Organization default (#{current_organization.time_zone})" }, { class: ui_input } %>
+    <% end %>
+
+    <%= form_row "RSVP confirmations", hint: "Ask \"yes\" RSVPs to confirm they're still coming this many days before each session. Leave blank to disable." do %>
+      <%= form.number_field :confirmation_days_before, min: 1, max: 14, class: ui_input + " md:w-40" %>
+    <% end %>
+
+    <%= form_row "Reminder message", hint: "Custom text for the day-before reminder. Merge tags work. Leave blank for the default reminder." do %>
+      <%= form.text_area :reminder_body, rows: 3, class: ui_input %>
+      <details class="mt-2 rounded-md border border-gray-200 dark:border-slate-700/70">
+        <summary class="cursor-pointer px-3 py-2 text-sm text-gray-600 dark:text-slate-300 select-none">Translations</summary>
+        <div class="px-3 pb-3"><%= render "shared/language_variants", record: event, param_name: "event" %></div>
+      </details>
+    <% end %>
+
+    <%= form_row "Invited", hint: "Optional list (segment) this event targets. Use \"Text invitees\" on the event page to blast them. Doesn't restrict public RSVPs." do %>
+      <%= form.collection_select :invited_segment_id, Segment.visible_to(current_membership).order(:name), :id, :name, { include_blank: "Everyone in scope" }, { class: ui_input } %>
+    <% end %>
+
+    <%= form_row "Tags", hint: "Comma-separated event or campaign tags for organizing the events list." do %>
+      <%= form.text_field :tag_list, placeholder: "spring-campaign, training", class: ui_input %>
+    <% end %>
+
+    <%= form_row "Visibility" do %>
+      <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
+        <%= form.check_box :unlisted, class: "h-4 w-4 accent-indigo-500" %>
+        Unlisted — hidden from the public events page and calendar feed (direct link still works)
+      </label>
+    <% end %>
+
     <%= form_row "Scope" do %>
       <%= select_tag "event[access_scope_gid]",
             options_for_select(

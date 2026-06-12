@@ -28,13 +28,13 @@ Mirrors [Solidarity Tech's core concepts](https://www.solidarity.tech/docs/solid
 | Texting | Two-way inbox (live via Turbo Streams), MMS attachments, templates (global + per-event, with a picker in the inbox and workflows), keywords with auto-replies, STOP/START opt-out |
 | Text blasts | Now/scheduled sends, live character/segment counter with cost estimate, test sends, clone, per-language message variants, link shortening with per-recipient click tracking and form-submission attribution, texting-hours compliance (queue/skip/override, recipient-timezone aware), delivery + click stats |
 | Email | Rich-text blasts to segments, email templates, open tracking, unsubscribe links, scheduling |
-| Events | Public RSVP pages, capacity/waitlists, 24h SMS reminders, check-in |
+| Events | Multi-session events with daily/weekly/monthly recurrence (rolling auto-generation), public RSVP pages with Yes/Maybe/No, per-session capacity/waitlists, RSVP confirmations N days out, day-before SMS + email reminders with attached calendar invite (customizable, per-language), iCal subscription feed, no-login Host Tools link, supporter-submitted events with approval queue, cross-org co-hosting via invite code, clone, unlisted events, tags, invited lists with one-click blast, attendance webhook for virtual platforms |
 | Forms | Signup forms & petitions with goals, public pages, submissions upsert people |
 | Donations | Manual entry plus a tokenized webhook for payment processors; feeds the donation automation trigger |
 | Automations | Multiple triggers per workflow (keyword, tag, form, RSVP w/ status filter, attendance, donation, link click, email open, person created, incoming text with contains/exact/regex filter); actions: SMS, email, tag/untag, wait, notify member (email or SMS), update property, webhook, RSVP to event; decision router with list-based branches (first-match or all-matches, "everyone else" branch, nested steps); once-per-person enrollment with manual re-enroll; goals that exit runs early; per-step reach counts and goal rate |
 | Reporting | Dashboard with per-chapter filtering: growth, reply rates, open rates, attendance |
 
-Deferred for now: browser calling/phonebanks, real payment processing (donations are records only), AI translation of message variants.
+Deferred for now: browser calling/phonebanks, real payment processing (donations are records only), AI translation of message variants, direct Zoom API integration (use the attendance webhook instead).
 
 ## Getting started
 
@@ -66,8 +66,9 @@ demoable locally. Emails open in the browser via letter_opener.
   the keyword auto-reply.
 - **Petition + workflow**: visit `/o/riverside-united/f/save-our-library`,
   sign it, and watch the "Welcome new signers" workflow tag + text the signer.
-- **Events**: `/o/riverside-united/events` → RSVP, then check people in from
-  the admin event page.
+- **Events**: `/o/riverside-united/events` → RSVP (Yes/Maybe/No), then check
+  people in from the admin event page or the no-login Host Tools link. Add
+  extra sessions or a weekly recurrence and watch future sessions appear.
 - **Donation webhook**: the Donations page shows your org's webhook URL — POST
   `{ "phone": "...", "amount_cents": 2500, "source": "actblue" }` to it and the
   donation appears, firing any donation-triggered automations.

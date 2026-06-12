@@ -11,7 +11,7 @@ class BlastsController < ApplicationController
   end
 
   def new
-    @blast = current_organization.blasts.new(access_scope: current_organization)
+    @blast = current_organization.blasts.new(access_scope: current_organization, segment_id: params[:segment_id].presence)
     if params[:template_id] && (template = current_organization.sms_templates.find_by(id: params[:template_id]))
       @blast.body = template.body
       @blast.variants = template.variants

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -179,24 +179,66 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
     t.index ["organization_id"], name: "index_email_templates_on_organization_id"
   end
 
+  create_table "event_co_hosts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "organization_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "organization_id"], name: "index_event_co_hosts_on_event_id_and_organization_id", unique: true
+    t.index ["event_id"], name: "index_event_co_hosts_on_event_id"
+    t.index ["organization_id"], name: "index_event_co_hosts_on_organization_id"
+  end
+
+  create_table "event_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "ends_at"
+    t.integer "event_id", null: false
+    t.boolean "is_primary", default: false, null: false
+    t.string "location"
+    t.datetime "starts_at", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.string "virtual_url"
+    t.index ["event_id"], name: "index_event_sessions_on_event_id"
+    t.index ["starts_at"], name: "index_event_sessions_on_starts_at"
+  end
+
   create_table "events", force: :cascade do |t|
     t.integer "access_scope_id", null: false
     t.string "access_scope_type", null: false
+    t.boolean "approved", default: true, null: false
     t.integer "capacity"
+    t.string "cohost_code"
+    t.integer "confirmation_days_before"
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "ends_at"
     t.string "event_type", default: "in_person", null: false
     t.integer "host_id"
+    t.string "host_token"
+    t.integer "invited_segment_id"
     t.string "location"
     t.integer "organization_id", null: false
+    t.integer "recurrence_days_ahead", default: 30, null: false
+    t.string "recurrence_frequency", default: "none", null: false
+    t.date "recurrence_until"
+    t.text "reminder_body"
     t.datetime "starts_at", null: false
+    t.integer "submitted_by_id"
+    t.string "tag_list"
+    t.string "time_zone"
     t.string "title", null: false
+    t.boolean "unlisted", default: false, null: false
     t.datetime "updated_at", null: false
+    t.json "variants", default: {}, null: false
     t.string "virtual_url"
     t.index ["access_scope_type", "access_scope_id"], name: "index_events_on_access_scope"
+    t.index ["cohost_code"], name: "index_events_on_cohost_code", unique: true
     t.index ["host_id"], name: "index_events_on_host_id"
+    t.index ["host_token"], name: "index_events_on_host_token", unique: true
+    t.index ["invited_segment_id"], name: "index_events_on_invited_segment_id"
     t.index ["organization_id"], name: "index_events_on_organization_id"
+    t.index ["submitted_by_id"], name: "index_events_on_submitted_by_id"
   end
 
   create_table "form_fields", force: :cascade do |t|
@@ -338,13 +380,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
 
   create_table "rsvps", force: :cascade do |t|
     t.boolean "attended", default: false, null: false
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
+    t.integer "event_session_id", null: false
     t.integer "person_id", null: false
     t.string "status", default: "yes", null: false
     t.datetime "updated_at", null: false
-    t.index ["event_id", "person_id"], name: "index_rsvps_on_event_id_and_person_id", unique: true
     t.index ["event_id"], name: "index_rsvps_on_event_id"
+    t.index ["event_session_id", "person_id"], name: "index_rsvps_on_event_session_id_and_person_id", unique: true
+    t.index ["event_session_id"], name: "index_rsvps_on_event_session_id"
     t.index ["person_id"], name: "index_rsvps_on_person_id"
   end
 
@@ -528,7 +573,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
   add_foreign_key "email_deliveries", "email_blasts"
   add_foreign_key "email_deliveries", "people"
   add_foreign_key "email_templates", "organizations"
+  add_foreign_key "event_co_hosts", "events"
+  add_foreign_key "event_co_hosts", "organizations"
+  add_foreign_key "event_sessions", "events"
   add_foreign_key "events", "organizations"
+  add_foreign_key "events", "people", column: "submitted_by_id"
+  add_foreign_key "events", "segments", column: "invited_segment_id"
   add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "form_fields", "forms"
   add_foreign_key "forms", "organizations"
@@ -546,6 +596,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
   add_foreign_key "notes", "users"
   add_foreign_key "organizations", "organizations", column: "parent_id"
   add_foreign_key "people", "organizations"
+  add_foreign_key "rsvps", "event_sessions"
   add_foreign_key "rsvps", "events"
   add_foreign_key "rsvps", "people"
   add_foreign_key "segments", "organizations"

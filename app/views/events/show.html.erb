@@ -2,24 +2,72 @@
 
 <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
   <div>
-    <h1 class="font-bold text-3xl"><%= @event.title %></h1>
+    <div class="flex items-center gap-2">
+      <h1 class="font-bold text-3xl"><%= @event.title %></h1>
+      <%= status_pill "Pending approval", :yellow unless @event.approved? %>
+      <%= status_pill "Unlisted", :gray if @event.unlisted? %>
+      <% if @event.organization_id != current_organization.id %>
+        <%= status_pill "Co-hosted with #{@event.organization.name}", :blue %>
+      <% end %>
+    </div>
     <div class="text-gray-500 dark:text-slate-400 mt-1">
-      <%= @event.starts_at.in_time_zone(current_organization.time_zone).strftime("%A %b %-d, %Y %l:%M %p") %>
+      <%= @event.starts_at.in_time_zone(@event.display_time_zone).strftime("%A %b %-d, %Y %l:%M %p %Z") %>
       <%= " · #{@event.location}" if @event.location.present? %>
       <%= " · Virtual" if @event.virtual_url.present? %>
+      <%= " · repeats #{@event.recurrence_frequency}" if @event.recurrence_frequency != "none" %>
     </div>
+    <% if @event.tags.any? %>
+      <div class="flex gap-1.5 mt-1.5">
+        <% @event.tags.each do |tag| %>
+          <%= link_to tag, events_path(tag: tag), class: "text-xs rounded-full px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/20" %>
+        <% end %>
+      </div>
+    <% end %>
     <div class="text-sm text-gray-400 dark:text-slate-500 mt-1">
-      Public page: <%= link_to public_event_url(current_organization.slug, @event), public_event_url(current_organization.slug, @event), class: "text-indigo-600 dark:text-indigo-400 hover:underline break-all" %>
+      Public page: <%= link_to public_event_url(@event.organization.slug, @event), public_event_url(@event.organization.slug, @event), class: "text-indigo-600 dark:text-indigo-400 hover:underline break-all" %>
     </div>
   </div>
-  <div class="flex gap-2">
+  <div class="flex gap-2 flex-wrap">
+    <% unless @event.approved? %>
+      <%= button_to "Approve & publish", approve_event_path(@event), method: :post, class: "rounded-md px-3.5 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-medium cursor-pointer" %>
+    <% end %>
+    <% if @event.invited_segment %>
+      <%= link_to "Text invitees", new_blast_path(segment_id: @event.invited_segment_id), class: "rounded-md px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium" %>
+    <% end %>
     <%= link_to "Edit", edit_event_path(@event), class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium" %>
+    <%= button_to "Clone", clone_event_path(@event), method: :post, class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
     <%= button_to "Delete", @event, method: :delete, data: { turbo_confirm: "Delete this event?" }, class: "rounded-md px-3.5 py-2 border border-red-500/40 text-red-600 dark:text-red-400 bg-white dark:bg-slate-800/60 hover:bg-red-500/10 text-sm font-medium cursor-pointer" %>
   </div>
 </div>
 
 <% if @event.description.present? %>
   <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 mb-6 text-sm whitespace-pre-wrap"><%= @event.description %></div>
+<% end %>
+
+<h2 class="font-semibold text-lg mb-2">Sessions</h2>
+<div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-200 dark:divide-slate-700/60 mb-2">
+  <% @sessions.each do |session| %>
+    <div class="p-4 flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <div class="font-medium"><%= session.display_title %><%= " (first session)" if session.is_primary? %></div>
+        <div class="text-sm text-gray-500 dark:text-slate-400">
+          <%= session.starts_at.in_time_zone(@event.display_time_zone).strftime("%a %b %-d, %Y %l:%M %p") %>
+          <%= " · #{session.location}" if session.location.present? %>
+          · <%= "#{session.yes_rsvps.count} going" %>
+        </div>
+      </div>
+      <% unless session.is_primary? %>
+        <%= button_to "Remove", event_session_path(session), method: :delete, data: { turbo_confirm: "Remove this session and its RSVPs?" }, class: "text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer shrink-0" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+<%= form_with url: event_event_sessions_path(@event), method: :post, scope: :event_session, class: "flex flex-wrap gap-2 items-end mb-6" do |form| %>
+  <%= form.text_field :title, placeholder: "Session title (optional)", class: "rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm" %>
+  <%= form.text_field :starts_at, placeholder: "Starts at", required: true, data: { controller: "datepicker" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm w-52" %>
+  <%= form.text_field :ends_at, placeholder: "Ends at (optional)", data: { controller: "datepicker" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm w-52" %>
+  <%= form.text_field :location, placeholder: "Location override", class: "rounded-md border border-gray-300 dark:border-slate-600 px-3 py-2 bg-white dark:bg-slate-800/60 text-sm" %>
+  <%= form.submit "Add session", class: "rounded-md px-3.5 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700 text-sm font-medium cursor-pointer" %>
 <% end %>
 
 <h2 class="font-semibold text-lg mb-2">
@@ -30,14 +78,34 @@
     <p class="p-4 text-gray-500 dark:text-slate-400 text-sm">No RSVPs yet. Share the public page link above.</p>
   <% end %>
   <% @rsvps.each do |rsvp| %>
-    <div class="p-4 flex items-center justify-between">
-      <div>
+    <div class="p-4 flex items-center justify-between gap-3">
+      <div class="min-w-0">
         <%= link_to rsvp.person.name, rsvp.person, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
-        <span class="text-xs rounded-full px-2 py-0.5 ml-2 <%= { 'yes' => 'bg-green-500/10 text-green-600 dark:text-green-400', 'waitlist' => 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300', 'canceled' => 'bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-slate-500' }[rsvp.status] %>"><%= rsvp.status %></span>
+        <span class="text-xs rounded-full px-2 py-0.5 ml-2 <%= { 'yes' => 'bg-green-500/10 text-green-600 dark:text-green-400', 'maybe' => 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300', 'no' => 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400', 'waitlist' => 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300', 'canceled' => 'bg-gray-200 dark:bg-slate-700 text-gray-400 dark:text-slate-500' }[rsvp.status] %>"><%= rsvp.status %></span>
+        <% if rsvp.confirmed_at.present? %><span class="text-xs text-green-600 dark:text-green-400 ml-1">✓ confirmed</span><% end %>
+        <% if @sessions.size > 1 %>
+          <div class="text-xs text-gray-400 dark:text-slate-500 mt-0.5"><%= rsvp.event_session.display_title %></div>
+        <% end %>
       </div>
-      <%= button_to rsvp.attended? ? "✓ Attended" : "Check in", check_in_event_path(@event, rsvp_id: rsvp.id), method: :post, class: "text-sm rounded-md px-3 py-1.5 cursor-pointer #{rsvp.attended? ? 'bg-green-600 text-white' : 'border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700'}" %>
+      <%= button_to rsvp.attended? ? "✓ Attended" : "Check in", check_in_event_path(@event, rsvp_id: rsvp.id), method: :post, class: "text-sm rounded-md px-3 py-1.5 cursor-pointer shrink-0 #{rsvp.attended? ? 'bg-green-600 text-white' : 'border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800/60 hover:bg-gray-100 dark:hover:bg-slate-700'}" %>
     </div>
   <% end %>
+</div>
+
+<div class="grid md:grid-cols-2 gap-4 mt-6">
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 text-sm">
+    <h3 class="font-semibold mb-1">Host Tools</h3>
+    <p class="text-gray-500 dark:text-slate-400">No-login link for the event host to see RSVPs and mark attendance. Keep it private.</p>
+    <code class="block mt-2 text-xs bg-gray-100 dark:bg-slate-900/70 rounded p-2 break-all"><%= host_tools_url(token: @event.host_token!) %></code>
+  </div>
+  <div class="bg-white dark:bg-slate-800/60 rounded-lg border border-gray-200 dark:border-slate-700/70 p-4 text-sm">
+    <h3 class="font-semibold mb-1">Co-host code</h3>
+    <p class="text-gray-500 dark:text-slate-400">Share with another organization — they redeem it under Events to co-host. RSVPs and attendance sync automatically.</p>
+    <code class="block mt-2 text-xs bg-gray-100 dark:bg-slate-900/70 rounded p-2 break-all"><%= @event.cohost_code! %></code>
+    <% if @event.co_host_organizations.any? %>
+      <p class="text-gray-500 dark:text-slate-400 mt-2">Co-hosts: <%= @event.co_host_organizations.map(&:name).join(", ") %></p>
+    <% end %>
+  </div>
 </div>
 
 <div class="flex items-center justify-between mt-6 mb-2">

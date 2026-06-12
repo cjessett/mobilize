@@ -38,13 +38,14 @@ class EventTest < ActiveSupport::TestCase
 
   test "reminder texts yes RSVPs and skips stale schedules" do
     @event.rsvp_for!(people(:maria))
+    session = @event.primary_session
 
     assert_no_difference "Message.count" do
-      Event::ReminderJob.perform_now(@event, (@event.starts_at - 1.hour).to_i)
+      Event::ReminderJob.perform_now(session, (session.starts_at - 1.hour).to_i)
     end
 
     assert_difference "Message.count" do
-      Event::ReminderJob.perform_now(@event, @event.starts_at.to_i)
+      Event::ReminderJob.perform_now(session, session.starts_at.to_i)
     end
     assert_match @event.title, people(:maria).messages.outbound.last.body
   end
