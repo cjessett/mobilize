@@ -22,7 +22,7 @@ class WorkflowTrigger < ApplicationRecord
 
   def post_matches?(post_id)
     shortcode = config["post_shortcode"].presence
-    return true if shortcode.blank?
+    return false if shortcode.blank?
 
     Instagram::Shortcode.to_id(shortcode) == post_id.to_s
   end
