@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_040356) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -300,6 +300,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
 
   create_table "organizations", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "instagram_access_token"
+    t.string "instagram_page_id"
     t.string "name", null: false
     t.integer "parent_id"
     t.string "slug", null: false
@@ -322,6 +324,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
     t.boolean "do_not_call", default: false, null: false
     t.string "email"
     t.string "first_name"
+    t.string "instagram_user_id"
     t.string "last_name"
     t.datetime "opted_out_sms_at"
     t.integer "organization_id", null: false
@@ -332,6 +335,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_045025) do
     t.datetime "updated_at", null: false
     t.string "zip_code"
     t.index ["organization_id", "email"], name: "index_people_on_organization_id_and_email"
+    t.index ["organization_id", "instagram_user_id"], name: "index_people_on_organization_id_and_instagram_user_id", unique: true, where: "instagram_user_id IS NOT NULL"
     t.index ["organization_id", "phone"], name: "index_people_on_organization_id_and_phone", unique: true, where: "phone IS NOT NULL"
     t.index ["organization_id"], name: "index_people_on_organization_id"
   end

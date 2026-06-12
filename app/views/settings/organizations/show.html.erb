@@ -36,6 +36,14 @@
         </div>
       <% end %>
 
+      <%= form_row "Instagram Page ID", hint: "Your Instagram Business Account / Page ID from Meta Developer Console." do %>
+        <%= form.text_field :instagram_page_id, placeholder: "e.g. 123456789", class: ui_input %>
+      <% end %>
+
+      <%= form_row "Instagram Access Token", hint: "Page Access Token with instagram_manage_messages permission. Obtain from Meta Developer Console → your app → Instagram → Messaging." do %>
+        <%= form.text_field :instagram_access_token, placeholder: "EAABsbCS…", class: ui_input %>
+      <% end %>
+
       <%= form_actions do %>
         <%= form.submit "Save Settings", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
       <% end %>

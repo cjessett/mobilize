@@ -56,7 +56,8 @@ export default class extends Controller {
       update_custom_field: ["key", "value"],
       webhook: ["url"],
       rsvp_person_to_event: ["event_id"],
-      router: ["mode", "branches"]
+      router: ["mode", "branches"],
+      send_instagram_dm: ["body", "body_meta", "button_text", "button_payload", "button_url"]
     }[action] || []
 
     row.querySelectorAll("[data-role]").forEach((el) => {
@@ -76,7 +77,7 @@ export default class extends Controller {
   }
 
   nameRow(row, prefix) {
-    const fields = ["action", "subject", "body", "tag_name", "duration_minutes", "email", "channel", "key", "value", "url", "event_id", "mode"]
+    const fields = ["action", "subject", "body", "tag_name", "duration_minutes", "email", "channel", "key", "value", "url", "event_id", "mode", "button_text", "button_payload", "button_url"]
     row.querySelectorAll("[data-role]").forEach((el) => {
       if (el.closest("[data-step-row]") !== row) return
       if (!fields.includes(el.dataset.role) || !("name" in el)) return

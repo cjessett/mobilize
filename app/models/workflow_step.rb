@@ -1,5 +1,5 @@
 class WorkflowStep < ApplicationRecord
-  ACTIONS = %w[send_sms send_email add_tag remove_tag wait notify_member update_custom_field webhook rsvp_person_to_event router].freeze
+  ACTIONS = %w[send_sms send_email add_tag remove_tag wait notify_member update_custom_field webhook rsvp_person_to_event router send_instagram_dm].freeze
 
   belongs_to :workflow
   belongs_to :parent_step, class_name: "WorkflowStep", optional: true
@@ -9,7 +9,7 @@ class WorkflowStep < ApplicationRecord
   validates :action, inclusion: { in: ACTIONS }
   validates :position, presence: true
 
-  def execute(person)
+  def execute(person, context = {})
     case action
     when "send_sms"
       Message.compose!(person: person, body: params["body"], respect_texting_hours: true).deliver_later unless person.opted_out_sms? || person.phone.blank?
@@ -39,6 +39,22 @@ class WorkflowStep < ApplicationRecord
     when "rsvp_person_to_event"
       event = workflow.organization.events.find_by(id: params["event_id"])
       event&.rsvp_for!(person)
+    when "send_instagram_dm"
+      org = workflow.organization
+      return unless org.instagram_access_token.present?
+
+      provider = Instagram::Provider.new(org.instagram_page_id, org.instagram_access_token)
+      button_opts = {
+        button_text: params["button_text"].presence,
+        button_payload: params["button_payload"].presence,
+        button_url: params["button_url"].presence
+      }
+
+      if context["comment_id"].present?
+        provider.send_dm_to_comment(comment_id: context["comment_id"], body: params["body"].to_s, **button_opts)
+      elsif context["instagram_user_id"].present?
+        provider.send_dm_to_user(instagram_user_id: context["instagram_user_id"], body: params["body"].to_s, **button_opts)
+      end
     end
   end
 

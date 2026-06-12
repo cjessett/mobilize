@@ -1,5 +1,5 @@
 <% nested = local_assigns.fetch(:nested, false) %>
-<% actions = [ [ "Send SMS", "send_sms" ], [ "Send email", "send_email" ], [ "Add tag", "add_tag" ], [ "Remove tag", "remove_tag" ], [ "Wait", "wait" ], [ "Notify member", "notify_member" ], [ "Update property", "update_custom_field" ], [ "Webhook", "webhook" ], [ "RSVP to event", "rsvp_person_to_event" ] ] %>
+<% actions = [ [ "Send SMS", "send_sms" ], [ "Send email", "send_email" ], [ "Add tag", "add_tag" ], [ "Remove tag", "remove_tag" ], [ "Wait", "wait" ], [ "Notify member", "notify_member" ], [ "Update property", "update_custom_field" ], [ "Webhook", "webhook" ], [ "RSVP to event", "rsvp_person_to_event" ], [ "Send Instagram DM", "send_instagram_dm" ] ] %>
 <% actions += [ [ "Router (branch)", "router" ] ] unless nested %>
 <div data-step-row data-controller="template-picker sms-counter" class="flex flex-wrap gap-2 items-start bg-white dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700/70 rounded-md p-2">
   <%= select_tag "workflow[steps][][action]",
@@ -39,6 +39,15 @@
 
   <%= url_field_tag "workflow[steps][][url]", step["url"], placeholder: "https://example.com/hook",
         data: { role: "url" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-72" %>
+
+  <%= text_field_tag "workflow[steps][][button_text]", step["button_text"], placeholder: "Button label (e.g. Send me the link!)",
+        data: { role: "button_text" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-60" %>
+
+  <%= text_field_tag "workflow[steps][][button_payload]", step["button_payload"], placeholder: "Quick reply keyword (e.g. SEND_LINK)",
+        data: { role: "button_payload" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-56" %>
+
+  <%= url_field_tag "workflow[steps][][button_url]", step["button_url"], placeholder: "URL button link (optional)",
+        data: { role: "button_url" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-64" %>
 
   <%= select_tag "workflow[steps][][event_id]",
         options_for_select(current_organization.events.order(starts_at: :desc).map { |e| [ e.title, e.id ] }, step["event_id"]),

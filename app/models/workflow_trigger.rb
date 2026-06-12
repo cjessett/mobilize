@@ -12,6 +12,8 @@ class WorkflowTrigger < ApplicationRecord
     case trigger
     when "incoming_text" then text_matches?(payload[:body].to_s)
     when "rsvp_created" then status_matches?(payload[:status])
+    when "instagram_comment_received" then text_matches?(payload[:comment_text].to_s)
+    when "instagram_dm_received" then text_matches?(payload[:message_text].to_s)
     else true
     end
   end

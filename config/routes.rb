@@ -73,6 +73,8 @@ Rails.application.routes.draw do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"
     post "donations/:token", to: "donations#create", as: :donations
+    get  "instagram", to: "instagram#verify"
+    post "instagram", to: "instagram#create"
   end
 
   namespace :settings do
