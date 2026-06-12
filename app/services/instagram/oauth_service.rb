@@ -1,19 +1,14 @@
 require "net/http"
 require "json"
 
-# Uses Instagram Business Login (the modern Instagram-native OAuth flow).
-# No Facebook Login or Pages API required — the token is an Instagram user
-# token scoped directly to the connected Instagram Business Account.
 class Instagram::OauthService
-  AUTHORIZE_URL  = "https://www.instagram.com/oauth/authorize"
-  TOKEN_URL      = "https://api.instagram.com/oauth/access_token"
-  LONG_LIVED_URL = "https://graph.instagram.com/access_token"
-  GRAPH_URL      = "https://graph.instagram.com/v21.0"
+  AUTHORIZE_URL = "https://www.facebook.com/v21.0/dialog/oauth"
+  GRAPH_URL     = "https://graph.facebook.com/v21.0"
 
   SCOPES = %w[
-    instagram_business_basic
-    instagram_business_manage_messages
-    instagram_business_manage_comments
+    instagram_manage_messages
+    instagram_manage_comments
+    pages_show_list
   ].join(",").freeze
 
   def self.auth_url(redirect_uri:, state:)
@@ -27,46 +22,57 @@ class Instagram::OauthService
     "#{AUTHORIZE_URL}?#{params}"
   end
 
-  # Exchanges the auth code for a long-lived Instagram user token and returns
-  # a single-element array with the connected account's info so the controller
-  # can use the same multi-account flow without changes.
+  # Returns array of { page_id:, page_name:, ig_username:, access_token: }
+  # for each Facebook Page that has a connected Instagram Business Account.
   def self.exchange_and_fetch_pages(code:, redirect_uri:)
-    short_lived = exchange_code(code: code, redirect_uri: redirect_uri)
-    long_lived  = exchange_for_long_lived(short_lived_token: short_lived)
-    user        = get_user_info(long_lived)
-
-    [ {
-      page_id:      user["id"],
-      page_name:    user["username"],
-      ig_username:  user["username"],
-      access_token: long_lived
-    } ]
+    short_lived  = exchange_code(code: code, redirect_uri: redirect_uri)
+    long_lived   = exchange_for_long_lived(user_token: short_lived)
+    pages_with_instagram(user_token: long_lived)
   end
 
   private
 
   def self.exchange_code(code:, redirect_uri:)
-    response = post(TOKEN_URL,
+    response = post("#{GRAPH_URL}/oauth/access_token",
       client_id:     ENV["INSTAGRAM_APP_ID"],
       client_secret: ENV["INSTAGRAM_APP_SECRET"],
-      grant_type:    "authorization_code",
       redirect_uri:  redirect_uri,
       code:          code
     )
     response["access_token"]
   end
 
-  def self.exchange_for_long_lived(short_lived_token:)
-    response = get(LONG_LIVED_URL,
-      grant_type:    "ig_exchange_token",
-      client_secret: ENV["INSTAGRAM_APP_SECRET"],
-      access_token:  short_lived_token
+  def self.exchange_for_long_lived(user_token:)
+    response = get("#{GRAPH_URL}/oauth/access_token",
+      grant_type:        "fb_exchange_token",
+      client_id:         ENV["INSTAGRAM_APP_ID"],
+      client_secret:     ENV["INSTAGRAM_APP_SECRET"],
+      fb_exchange_token: user_token
     )
     response["access_token"]
   end
 
-  def self.get_user_info(access_token)
-    get("#{GRAPH_URL}/me", fields: "id,username", access_token: access_token)
+  def self.pages_with_instagram(user_token:)
+    response = get("#{GRAPH_URL}/me/accounts",
+      fields:       "id,name,access_token,instagram_business_account",
+      access_token: user_token
+    )
+
+    Array(response["data"]).filter_map do |page|
+      ig_id = page.dig("instagram_business_account", "id")
+      next if ig_id.blank?
+
+      page_token   = page["access_token"]
+      ig_username  = fetch_ig_username(ig_user_id: ig_id, access_token: page_token)
+
+      { page_id: ig_id, page_name: page["name"], ig_username: ig_username, access_token: page_token }
+    end
+  end
+
+  def self.fetch_ig_username(ig_user_id:, access_token:)
+    get("#{GRAPH_URL}/#{ig_user_id}", fields: "username", access_token: access_token)["username"]
+  rescue StandardError
+    nil
   end
 
   def self.get(url, params = {})
