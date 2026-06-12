@@ -12,7 +12,7 @@ class Workflow::RunStepJob < ApplicationJob
     end
 
     resolver = Workflow::StepResolver.new(run)
-    step.execute(run.person) unless step.wait? || step.router?
+    step.execute(run.person, run.context) unless step.wait? || step.router?
     record_execution(step, run)
     advance(run, resolver.next_step(step))
     return unless run.status == "running" && run.current_step_id

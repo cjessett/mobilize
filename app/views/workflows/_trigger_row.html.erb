@@ -4,7 +4,10 @@
           [ "Keyword received", "keyword_received" ], [ "Tag added", "tag_added" ], [ "Form submitted", "form_submitted" ],
           [ "Event RSVP", "rsvp_created" ], [ "Event attended", "event_attended" ], [ "Donation received", "donation_created" ],
           [ "Link clicked", "link_clicked" ], [ "Person created", "person_created" ], [ "Incoming text", "incoming_text" ],
-          [ "Email opened", "email_opened" ]
+          [ "Email opened", "email_opened" ],
+          [ "Instagram comment", "instagram_comment_received" ],
+          [ "Instagram DM / button tap", "instagram_dm_received" ],
+          [ "Instagram follow", "instagram_follow_received" ]
         ], trigger["trigger"]),
         data: { role: "trigger", action: "triggers#triggerChanged" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
 
@@ -21,6 +24,12 @@
   <%= select_tag "workflow[triggers][][status]",
         options_for_select([ [ "Any RSVP status", "" ], [ "Yes", "yes" ], [ "Waitlist", "waitlist" ], [ "Canceled", "canceled" ] ], trigger["status"]),
         data: { role: "status" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60" %>
+
+  <% post_url_value = trigger["post_shortcode"].present? ? Instagram::Shortcode.to_url(trigger["post_shortcode"]) : trigger["post_url"] %>
+  <%= url_field_tag "workflow[triggers][][post_url]", post_url_value,
+        placeholder: "https://www.instagram.com/p/…",
+        required: true,
+        data: { role: "post_url" }, class: "rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1.5 text-sm bg-white dark:bg-slate-800/60 w-80" %>
 
   <button type="button" data-action="triggers#remove" class="ml-auto text-sm text-red-600 dark:text-red-400 hover:underline cursor-pointer mt-1.5">Remove</button>
 </div>

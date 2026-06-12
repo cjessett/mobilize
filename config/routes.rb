@@ -73,6 +73,8 @@ Rails.application.routes.draw do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"
     post "donations/:token", to: "donations#create", as: :donations
+    get  "instagram", to: "instagram#verify"
+    post "instagram", to: "instagram#create"
   end
 
   namespace :settings do
@@ -80,6 +82,15 @@ Rails.application.routes.draw do
     resources :chapters
     resources :members, only: [ :index, :new, :create, :destroy ]
     resources :custom_fields, only: [ :index, :create, :destroy ]
+    resources :instagram, only: [] do
+      collection do
+        get  :connect
+        get  :callback
+        get  :select_page
+        post :connect_page
+        delete :disconnect, action: :destroy
+      end
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

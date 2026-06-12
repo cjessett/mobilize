@@ -4,6 +4,7 @@ class Workflow < ApplicationRecord
   TRIGGERS = %w[
     keyword_received tag_added form_submitted rsvp_created donation_created
     link_clicked person_created incoming_text event_attended email_opened
+    instagram_comment_received instagram_dm_received instagram_follow_received
   ].freeze
 
   has_many :workflow_triggers, dependent: :destroy
@@ -33,7 +34,7 @@ class Workflow < ApplicationRecord
       next if workflow.workflow_steps.empty?
 
       begin
-        run = workflow.workflow_runs.create!(person: person)
+        run = workflow.workflow_runs.create!(person: person, context: payload.transform_keys(&:to_s))
       rescue ActiveRecord::RecordNotUnique
         next
       end

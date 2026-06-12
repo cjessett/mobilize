@@ -38,7 +38,10 @@ export default class extends Controller {
       link_clicked: ["param"],
       person_created: [],
       incoming_text: ["match_type", "value"],
-      email_opened: ["param"]
+      email_opened: ["param"],
+      instagram_comment_received: ["param", "match_type", "value", "post_url"],
+      instagram_dm_received: ["param", "match_type", "value"],
+      instagram_follow_received: []
     }[trigger] || []
 
     row.querySelectorAll("[data-role]").forEach((el) => {

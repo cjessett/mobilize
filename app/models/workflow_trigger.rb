@@ -12,11 +12,20 @@ class WorkflowTrigger < ApplicationRecord
     case trigger
     when "incoming_text" then text_matches?(payload[:body].to_s)
     when "rsvp_created" then status_matches?(payload[:status])
+    when "instagram_comment_received" then post_matches?(payload[:post_id]) && text_matches?(payload[:comment_text].to_s)
+    when "instagram_dm_received" then text_matches?(payload[:message_text].to_s)
     else true
     end
   end
 
   private
+
+  def post_matches?(post_id)
+    shortcode = config["post_shortcode"].presence
+    return false if shortcode.blank?
+
+    Instagram::Shortcode.to_id(shortcode) == post_id.to_s
+  end
 
   def text_matches?(body)
     value = config["value"].to_s

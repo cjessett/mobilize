@@ -65,15 +65,19 @@ class WorkflowsController < ApplicationController
   end
 
   def save_triggers
-    triggers = Array(params[:workflow][:triggers]).map { |t| t.permit(:trigger, :param, :match_type, :value, :status).to_h.compact_blank }
+    triggers = Array(params[:workflow][:triggers]).map { |t| t.permit(:trigger, :param, :match_type, :value, :status, :post_url).to_h.compact_blank }
     triggers = triggers.select { |t| Workflow::TRIGGERS.include?(t["trigger"]) }
     @workflow.workflow_triggers.destroy_all
     triggers.each do |t|
-      @workflow.workflow_triggers.create!(trigger: t["trigger"], param: t["param"], config: t.slice("match_type", "value", "status"))
+      config = t.slice("match_type", "value", "status")
+      if (shortcode = Instagram::Shortcode.from_url(t["post_url"]))
+        config["post_shortcode"] = shortcode
+      end
+      @workflow.workflow_triggers.create!(trigger: t["trigger"], param: t["param"], config: config)
     end
   end
 
-  STEP_FIELDS = [ :action, :body, :subject, :tag_name, :duration_minutes, :email, :channel, :key, :value, :url, :event_id, :mode ].freeze
+  STEP_FIELDS = [ :action, :body, :subject, :tag_name, :duration_minutes, :email, :channel, :key, :value, :url, :event_id, :mode, :button_text, :button_payload, :button_url ].freeze
 
   # Steps arrive as an indexed tree (named by the steps Stimulus controller
   # on submit): workflow[steps][0][action], and for routers

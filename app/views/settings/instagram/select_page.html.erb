@@ -1,0 +1,18 @@
+<%= render "shared/flash" %>
+
+<h1 class="font-bold text-3xl text-gray-900 dark:text-white mb-6">Connect Instagram</h1>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70 divide-y divide-gray-100 dark:divide-slate-700/40">
+  <div class="px-4 md:px-6 py-4">
+    <p class="text-sm text-gray-600 dark:text-slate-300">Multiple Instagram Business accounts were found. Select the one you want to connect to this organization.</p>
+  </div>
+
+  <% @pages.each do |page| %>
+    <%= button_to connect_page_settings_instagram_index_path, method: :post,
+          params: { page_id: page["page_id"] },
+          class: "w-full text-left px-4 md:px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors" do %>
+      <p class="text-sm font-medium text-gray-900 dark:text-white">@<%= page["ig_username"] %></p>
+      <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">via Facebook Page: <%= page["page_name"] %></p>
+    <% end %>
+  <% end %>
+</div>

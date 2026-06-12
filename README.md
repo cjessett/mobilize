@@ -31,7 +31,7 @@ Mirrors [Solidarity Tech's core concepts](https://www.solidarity.tech/docs/solid
 | Events | Public RSVP pages, capacity/waitlists, 24h SMS reminders, check-in |
 | Forms | Signup forms & petitions with goals, public pages, submissions upsert people |
 | Donations | Manual entry plus a tokenized webhook for payment processors; feeds the donation automation trigger |
-| Automations | Multiple triggers per workflow (keyword, tag, form, RSVP w/ status filter, attendance, donation, link click, email open, person created, incoming text with contains/exact/regex filter); actions: SMS, email, tag/untag, wait, notify member (email or SMS), update property, webhook, RSVP to event; decision router with list-based branches (first-match or all-matches, "everyone else" branch, nested steps); once-per-person enrollment with manual re-enroll; goals that exit runs early; per-step reach counts and goal rate |
+| Automations | Multiple triggers per workflow (keyword, tag, form, RSVP w/ status filter, attendance, donation, link click, email open, person created, incoming text with contains/exact/regex filter, Instagram comment/DM/follow); actions: SMS, email, tag/untag, wait, notify member (email or SMS), update property, webhook, RSVP to event, Instagram DM (with optional quick-reply or URL buttons); decision router with list-based branches (first-match or all-matches, "everyone else" branch, nested steps); once-per-person enrollment with manual re-enroll; goals that exit runs early; per-step reach counts and goal rate |
 | Reporting | Dashboard with per-chapter filtering: growth, reply rates, open rates, attendance |
 
 Deferred for now: browser calling/phonebanks, real payment processing (donations are records only), AI translation of message variants.
@@ -95,6 +95,57 @@ falls back to `localhost:3000`.
 
 For email, configure SMTP via Action Mailer in production (e.g. Resend, SES)
 and set `MAIL_FROM`.
+
+## Instagram setup (DM-from-comment campaigns)
+
+Instagram automations let you DM users who comment on your posts (with optional keyword triggers), respond to button taps in DMs with follow-up messages, and send welcome DMs to new followers. Each campaign is a separate workflow.
+
+### 1 — Create a Meta App
+
+1. Go to [developers.facebook.com](https://developers.facebook.com) → **My Apps → Create App → Business**
+2. Add the **Instagram** product → **Set Up**
+3. Under **Instagram → Settings**, connect the Facebook Page that is linked to your Instagram Business/Creator account
+
+### 2 — Configure OAuth
+
+In your Meta app dashboard:
+
+1. **App Settings → Basic**: copy your **App ID** and **App Secret**
+2. **Facebook Login → Settings → Valid OAuth Redirect URIs**: add `https://<your-host>/settings/instagram/callback`
+3. **App Review → Permissions**: request `instagram_manage_messages`, `instagram_manage_comments`, `pages_messaging`, `pages_show_list`, `pages_read_engagement` (in development you can use these as a test user without review)
+
+Set env vars:
+```
+INSTAGRAM_APP_ID=<your app id>
+INSTAGRAM_APP_SECRET=<your app secret>
+INSTAGRAM_WEBHOOK_VERIFY_TOKEN=<any random string you choose>
+```
+
+### 3 — Connect in Mobilize
+
+Go to **Settings → Organization** and click **Connect Instagram**. You'll be redirected to Meta to authorize the app. If multiple Instagram accounts are found you'll be prompted to choose one. The account name is shown once connected.
+
+### 4 — Register the webhook
+
+In your Meta app dashboard → **Webhooks → Instagram**:
+
+- Callback URL: `https://<your-host>/webhooks/instagram`
+- Verify token: the same value as `INSTAGRAM_WEBHOOK_VERIFY_TOKEN`
+- Subscribe to fields: **comments**, **messages**, **follows**
+
+Webhook signatures are validated automatically using `INSTAGRAM_APP_SECRET`.
+
+### 5 — Build campaigns
+
+Each campaign is a **Workflow**. Example two-step flow:
+
+| Workflow | Trigger | Keyword | Action |
+|----------|---------|---------|--------|
+| "Event RSVP prompt" | Instagram comment | `rsvp` | Send Instagram DM: "Thanks for your interest! 👇" + quick-reply button "Send me the link!" (payload: `SEND_LINK`) |
+| "Send RSVP link" | Instagram DM / button tap | `SEND_LINK` | Send Instagram DM: "Here it is!" + URL button "RSVP →" pointing to your event |
+| "Welcome followers" | Instagram follow | *(any)* | Send Instagram DM: "Welcome! Here's what we're about…" |
+
+Leave the keyword blank to match any comment/DM.
 
 ## Development
 
