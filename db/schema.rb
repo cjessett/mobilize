@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_13_000004) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -111,6 +111,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
     t.string "name", null: false
     t.integer "organization_id", null: false
     t.string "phone_number"
+    t.datetime "provisioned_at"
+    t.string "twilio_sid"
     t.datetime "updated_at", null: false
     t.index ["organization_id"], name: "index_chapters_on_organization_id"
   end
@@ -284,6 +286,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
     t.index ["tag_id"], name: "index_keywords_on_tag_id"
   end
 
+  create_table "ledger_entries", force: :cascade do |t|
+    t.bigint "amount_microcents", null: false
+    t.bigint "balance_after_microcents", null: false
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.string "entry_type", null: false
+    t.integer "message_id"
+    t.integer "organization_id", null: false
+    t.string "stripe_payment_intent_id"
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_ledger_entries_on_message_id"
+    t.index ["organization_id"], name: "index_ledger_entries_on_organization_id"
+  end
+
   create_table "link_clicks", force: :cascade do |t|
     t.datetime "clicked_at", null: false
     t.datetime "created_at", null: false
@@ -312,11 +328,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
     t.integer "blast_id"
     t.text "body", null: false
     t.integer "chapter_id"
+    t.bigint "cost_microcents"
     t.datetime "created_at", null: false
     t.string "direction", null: false
     t.string "error_message"
+    t.integer "num_segments"
     t.integer "organization_id", null: false
     t.integer "person_id", null: false
+    t.bigint "provider_cost_microcents"
     t.string "provider_sid"
     t.datetime "send_after"
     t.datetime "sent_at"
@@ -341,10 +360,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
   end
 
   create_table "organizations", force: :cascade do |t|
+    t.bigint "auto_recharge_amount_microcents"
+    t.boolean "auto_recharge_enabled", default: false, null: false
+    t.bigint "auto_recharge_threshold_microcents"
+    t.bigint "balance_microcents", default: 0, null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.integer "parent_id"
     t.string "slug", null: false
+    t.integer "sms_markup_bps", default: 0, null: false
+    t.string "stripe_customer_id"
     t.json "texting_days", default: [0, 1, 2, 3, 4, 5, 6], null: false
     t.integer "texting_hours_end", default: 21, null: false
     t.integer "texting_hours_start", default: 9, null: false
@@ -353,6 +378,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
     t.string "webhook_token"
     t.index ["parent_id"], name: "index_organizations_on_parent_id"
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
+    t.index ["stripe_customer_id"], name: "index_organizations_on_stripe_customer_id", unique: true
     t.index ["webhook_token"], name: "index_organizations_on_webhook_token", unique: true
   end
 
@@ -585,6 +611,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_052429) do
   add_foreign_key "forms", "tags", column: "apply_tag_id"
   add_foreign_key "keywords", "organizations"
   add_foreign_key "keywords", "tags"
+  add_foreign_key "ledger_entries", "messages"
+  add_foreign_key "ledger_entries", "organizations"
   add_foreign_key "link_clicks", "short_links"
   add_foreign_key "memberships", "organizations"
   add_foreign_key "memberships", "users"

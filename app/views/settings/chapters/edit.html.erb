@@ -1,3 +1,15 @@
 <%= back_link "Chapters", settings_chapters_path %>
 <h1 class="font-bold text-3xl text-gray-900 dark:text-white mt-2">Edit Chapter</h1>
 <%= render "form", chapter: @chapter %>
+
+<%= form_card do %>
+  <%= form_row @chapter.phone_number.present? ? "Replace number" : "Get a number", hint: "Provision a local SMS number from Twilio — just pick an area code. Costs ~$1.15/mo, billed to your balance." do %>
+    <%= form_with url: provision_number_settings_chapter_path(@chapter), method: :post, class: "flex items-end gap-3" do |form| %>
+      <div>
+        <label class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Area code</label>
+        <%= form.text_field :area_code, placeholder: "415", inputmode: "numeric", pattern: "\\d{3}", maxlength: 3, required: true, class: ui_input + " w-28 mt-1" %>
+      </div>
+      <%= form.submit "Get number", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer", data: { turbo_confirm: @chapter.phone_number.present? ? "Replace the current number? The old number stays on your Twilio account." : nil } %>
+    <% end %>
+  <% end %>
+<% end %>

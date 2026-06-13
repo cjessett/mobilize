@@ -25,6 +25,7 @@ class Webhooks::TwilioController < ActionController::Base
       else message.status == "delivered" ? "delivered" : params[:MessageStatus]
       end
       message.update!(status: status, error_message: params[:ErrorCode].presence)
+      Billing::ChargeMessage.new(message).call(twilio_price: params[:Price]) if %w[delivered undelivered failed].include?(params[:MessageStatus])
     end
     head :ok
   end

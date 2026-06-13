@@ -72,3 +72,5 @@ gem "csv", "~> 3.3"
 gem "twilio-ruby", "~> 7.10"
 
 gem "letter_opener", "~> 1.10", group: :development
+
+gem "stripe", "~> 13.0"

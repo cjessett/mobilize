@@ -85,13 +85,22 @@ Rails.application.routes.draw do
   namespace :webhooks do
     post "twilio/inbound_sms", to: "twilio#inbound_sms"
     post "twilio/sms_status", to: "twilio#sms_status"
+    post "stripe", to: "stripe#create"
     post "donations/:token", to: "donations#create", as: :donations
     post "attendance/:token", to: "attendance#create", as: :attendance
   end
 
   namespace :settings do
     resource :organization, only: [ :show, :update ]
-    resources :chapters
+    resources :chapters do
+      member do
+        post :provision_number
+      end
+    end
+    resource :billing, only: :show, controller: :billing do
+      post :add_payment_method
+      post :topup
+    end
     resources :members, only: [ :index, :new, :create, :destroy ]
     resources :custom_fields, only: [ :index, :create, :destroy ]
   end

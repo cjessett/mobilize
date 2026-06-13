@@ -1,0 +1,80 @@
+<%= render "shared/flash" %>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+  <h1 class="font-bold text-3xl text-gray-900 dark:text-white">Settings</h1>
+</div>
+
+<div class="bg-white dark:bg-slate-800/40 rounded-xl border border-gray-200 dark:border-slate-700/70">
+  <%= render "settings/nav" %>
+
+  <div class="grid md:grid-cols-2 gap-6 p-4 md:p-6">
+    <!-- Balance + add funds -->
+    <div class="rounded-xl border border-gray-200 dark:border-slate-700/70 p-6">
+      <p class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Prepaid balance</p>
+      <p class="mt-2 text-4xl font-bold <%= @organization.balance_microcents <= 0 ? "text-red-500" : "text-gray-900 dark:text-white" %>">
+        <%= @organization.balance_display %>
+      </p>
+      <p class="mt-1 text-sm text-gray-400 dark:text-slate-500">
+        Messages are billed at Twilio's per-message cost against this balance.
+      </p>
+
+      <%= form_with url: topup_settings_billing_path, method: :post, class: "mt-5 flex items-end gap-3" do |form| %>
+        <div>
+          <label class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Add funds (USD)</label>
+          <div class="mt-1 flex items-center gap-1">
+            <span class="text-gray-500 dark:text-slate-400">$</span>
+            <%= form.number_field :amount, value: 20, min: 5, step: 1, class: ui_input + " w-28" %>
+          </div>
+        </div>
+        <%= form.submit "Add funds", class: "rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <!-- Payment method -->
+    <div class="rounded-xl border border-gray-200 dark:border-slate-700/70 p-6">
+      <p class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Payment method</p>
+      <% if @payment_method %>
+        <p class="mt-3 text-lg text-gray-900 dark:text-white">
+          <%= @payment_method.brand.to_s.capitalize %> •••• <%= @payment_method.last4 %>
+        </p>
+        <p class="text-sm text-gray-400 dark:text-slate-500">Expires <%= @payment_method.exp_month %>/<%= @payment_method.exp_year %></p>
+        <%= button_to "Update card", add_payment_method_settings_billing_path, class: "mt-4 text-sm text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer" %>
+      <% else %>
+        <p class="mt-3 text-sm text-gray-500 dark:text-slate-400">No card on file. Add one to enable top-ups.</p>
+        <%= button_to "Add a card", add_payment_method_settings_billing_path, class: "mt-4 rounded-md px-4 py-2.5 bg-indigo-500 hover:bg-indigo-400 text-white font-medium cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Ledger -->
+  <div class="px-4 md:px-6 pb-6">
+    <p class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase mb-3">Recent activity</p>
+    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700/70">
+      <table class="w-full text-left min-w-[36rem]">
+        <thead>
+          <tr class="text-xs uppercase tracking-wider text-gray-400 dark:text-slate-500">
+            <th class="px-5 py-3 font-semibold">Date</th>
+            <th class="px-4 py-3 font-semibold">Description</th>
+            <th class="px-4 py-3 font-semibold text-right">Amount</th>
+            <th class="px-4 py-3 font-semibold text-right pr-6">Balance</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
+          <% if @entries.empty? %>
+            <tr><td colspan="4" class="px-5 py-6 text-sm text-gray-400 dark:text-slate-500">No activity yet.</td></tr>
+          <% end %>
+          <% @entries.each do |entry| %>
+            <tr>
+              <td class="px-5 py-3 text-sm text-gray-500 dark:text-slate-400 whitespace-nowrap"><%= entry.created_at.strftime("%b %-d, %-l:%M %p") %></td>
+              <td class="px-4 py-3 text-sm text-gray-700 dark:text-slate-300"><%= entry.description %></td>
+              <td class="px-4 py-3 text-sm text-right whitespace-nowrap <%= entry.amount_microcents.negative? ? "text-gray-700 dark:text-slate-300" : "text-green-600 dark:text-green-400" %>">
+                <%= entry.amount_microcents.negative? ? "−" : "+" %><%= Money.format(entry.amount_microcents.abs) %>
+              </td>
+              <td class="px-4 py-3 text-sm text-right text-gray-500 dark:text-slate-400 pr-6 whitespace-nowrap"><%= Money.format(entry.balance_after_microcents) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
