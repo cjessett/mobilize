@@ -34,7 +34,7 @@ Mirrors [Solidarity Tech's core concepts](https://www.solidarity.tech/docs/solid
 | Automations | Multiple triggers per workflow (keyword, tag, form, RSVP w/ status filter, attendance, donation, link click, email open, person created, incoming text with contains/exact/regex filter); actions: SMS, email, tag/untag, wait, notify member (email or SMS), update property, webhook, RSVP to event; decision router with list-based branches (first-match or all-matches, "everyone else" branch, nested steps); once-per-person enrollment with manual re-enroll; goals that exit runs early; per-step reach counts and goal rate |
 | Reporting | Dashboard with per-chapter filtering: growth, reply rates, open rates, attendance |
 
-Deferred for now: browser calling/phonebanks, real payment processing (donations are records only), AI translation of message variants, direct Zoom API integration (use the attendance webhook instead).
+Deferred for now: browser calling/phonebanks, donation processing (donations are records only — usage billing for SMS is handled via Stripe, see below), AI translation of message variants, direct Zoom API integration (use the attendance webhook instead).
 
 ## Getting started
 
@@ -77,12 +77,13 @@ demoable locally. Emails open in the browser via letter_opener.
 
 ## Twilio setup (real SMS)
 
-1. Buy a phone number per chapter in the Twilio console and set it on the
-   chapter (Settings → Chapters).
-2. Set env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and optionally
+1. Set env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and optionally
    `TWILIO_FROM_NUMBER` (fallback when a chapter has no number).
-3. Point the number's webhooks at your app (use [ngrok](https://ngrok.com) in
-   development: `ngrok http 3000`):
+2. Provision a number per chapter from **Settings → Chapters → Edit**: enter an
+   area code and the app finds, buys, and wires up an SMS-capable local number
+   automatically.
+3. Twilio webhooks are configured automatically on provisioned numbers (when
+   `APP_HOST` is set). For numbers added manually, point their webhooks at:
    - Messaging → "A message comes in": `POST https://<host>/webhooks/twilio/inbound_sms`
    - Status callback: `POST https://<host>/webhooks/twilio/sms_status`
 
@@ -96,6 +97,28 @@ falls back to `localhost:3000`.
 
 For email, configure SMTP via Action Mailer in production (e.g. Resend, SES)
 and set `MAIL_FROM`.
+
+## Billing (Stripe)
+
+Organizations pay for their own SMS usage via a prepaid balance. Because each
+text costs a fraction of a cent — far less than Stripe's per-charge fee — the
+card isn't charged per message. Instead an org **tops up** a dollar balance
+(Settings → Billing), and each message is debited at Twilio's actual cost
+(captured from the status callback). When a card is on file, sending is gated
+on a positive balance; orgs that haven't set up billing are unaffected.
+
+1. Set env vars: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and
+   `STRIPE_WEBHOOK_SECRET`.
+2. Point Stripe's webhook at `POST https://<host>/webhooks/stripe` and subscribe
+   to `checkout.session.completed` (used to save the card after Checkout).
+3. Optional tuning: `TWILIO_SMS_PRICE_MICROCENTS` (fallback per-segment price
+   when Twilio hasn't reported one, default `790` ≈ $0.0079) and
+   `TWILIO_NUMBER_PRICE_MICROCENTS` (charged on provisioning, default `115000`
+   ≈ $1.15). Per-message markup is pass-through by default (`sms_markup_bps`
+   on the organization, in basis points).
+
+Without `STRIPE_SECRET_KEY` the app uses an in-memory fake (card always on
+file, top-ups succeed instantly) so the flow is fully demoable offline.
 
 ## Development
 

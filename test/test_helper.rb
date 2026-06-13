@@ -14,9 +14,14 @@ module ActiveSupport
     include ActiveJob::TestHelper
     include ActionMailer::TestHelper
 
-    # Each test gets a fresh fake SMS provider so deliveries can be asserted.
-    setup { Sms.provider = Sms::FakeProvider.new }
+    # Each test gets a fresh fake SMS/billing provider so deliveries and
+    # charges can be asserted in isolation.
+    setup do
+      Sms.provider = Sms::FakeProvider.new
+      Billing.provider = Billing::FakeProvider.new
+    end
 
     def fake_sms = Sms.provider
+    def fake_billing = Billing.provider
   end
 end

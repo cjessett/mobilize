@@ -9,6 +9,7 @@ class Message::DeliverJob < ApplicationJob
     end
     return message.update!(status: "failed", error_message: "Person has opted out") if message.person.opted_out_sms?
     return message.update!(status: "failed", error_message: "Person has no phone number") if message.person.phone.blank?
+    return message.update!(status: "failed", error_message: "Insufficient balance — add funds to keep texting") if message.organization.sms_blocked?
 
     result = Sms.provider.send_message(
       to: message.person.phone,
