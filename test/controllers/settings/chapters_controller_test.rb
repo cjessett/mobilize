@@ -23,4 +23,27 @@ class Settings::ChaptersControllerTest < ActionDispatch::IntegrationTest
       delete settings_chapter_url(chapters(:main))
     end
   end
+
+  test "admin provisions a number by area code" do
+    sign_in_as users(:one)
+    chapter = chapters(:north)
+
+    post provision_number_settings_chapter_url(chapter), params: { area_code: "415" }
+
+    assert_redirected_to edit_settings_chapter_path(chapter)
+    assert chapter.reload.phone_number.start_with?("+1415")
+    assert_not_nil chapter.provisioned_at
+  end
+
+  test "provisioning surfaces an error for an exhausted area code" do
+    sign_in_as users(:one)
+    chapter = chapters(:north)
+    original = chapter.phone_number
+
+    post provision_number_settings_chapter_url(chapter), params: { area_code: "000" }
+
+    assert_redirected_to edit_settings_chapter_path(chapter)
+    assert_match(/No numbers available/, flash[:alert])
+    assert_equal original, chapter.reload.phone_number
+  end
 end

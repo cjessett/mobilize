@@ -2,5 +2,8 @@
   <%= tab_link "Organization", settings_organization_path, active: controller_name == "organizations" %>
   <%= tab_link "Chapters", settings_chapters_path, active: controller_name == "chapters" %>
   <%= tab_link "Members", settings_members_path, active: controller_name == "members" %>
+  <% if current_organization.billing_feature_enabled? %>
+    <%= tab_link "Billing", settings_billing_path, active: controller_name == "billing" %>
+  <% end %>
   <%= tab_link "Properties", settings_custom_fields_path, active: controller_name == "custom_fields" %>
 </div>

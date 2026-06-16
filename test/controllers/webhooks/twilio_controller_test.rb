@@ -30,4 +30,15 @@ class Webhooks::TwilioControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "delivered", message.reload.status
   end
+
+  test "status callback charges the org for the message when billing is active" do
+    organizations(:riverside).update!(stripe_customer_id: "cus_x", balance_microcents: Money.from_dollars(20))
+    message = Message.compose!(person: people(:maria), body: "hi")
+    message.update!(provider_sid: "SM777", status: "queued")
+
+    post webhooks_twilio_sms_status_url, params: { MessageSid: "SM777", MessageStatus: "delivered", Price: "-0.00750" }
+
+    assert_equal 750, message.reload.cost_microcents
+    assert_equal Money.from_dollars(20) - 750, organizations(:riverside).reload.balance_microcents
+  end
 end

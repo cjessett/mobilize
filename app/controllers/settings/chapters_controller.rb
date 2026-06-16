@@ -1,6 +1,6 @@
 class Settings::ChaptersController < ApplicationController
   require_admin
-  before_action :set_chapter, only: [ :edit, :update, :destroy ]
+  before_action :set_chapter, only: [ :edit, :update, :destroy, :provision_number ]
 
   def index
     @chapters = current_organization.chapters.order(:name)
@@ -39,7 +39,18 @@ class Settings::ChaptersController < ApplicationController
     end
   end
 
+  def provision_number
+    return redirect_to(edit_settings_chapter_path(@chapter), alert: "Number provisioning isn't enabled for this organization.") unless current_organization.billing_feature_enabled?
+
+    Sms::NumberProvisioner.new(@chapter).call(area_code: params[:area_code])
+    redirect_to edit_settings_chapter_path(@chapter), notice: "Number #{format_phone(@chapter.phone_number)} provisioned for #{@chapter.name}."
+  rescue Sms::Error => e
+    redirect_to edit_settings_chapter_path(@chapter), alert: e.message
+  end
+
   private
+
+  def format_phone(value) = PhoneNumber.format(value)
 
   def set_chapter
     @chapter = current_organization.chapters.find(params[:id])

@@ -10,6 +10,13 @@ class Message::DeliverJob < ApplicationJob
     return message.update!(status: "failed", error_message: "Person has opted out") if message.person.opted_out_sms?
     return message.update!(status: "failed", error_message: "Person has no phone number") if message.person.phone.blank?
 
+    if message.organization.sms_billable?
+      hold = Billing.estimated_cost(message)
+      unless message.organization.reserve_sms_hold!(hold, message: message)
+        return message.update!(status: "failed", error_message: "Insufficient balance — add funds to keep texting")
+      end
+    end
+
     result = Sms.provider.send_message(
       to: message.person.phone,
       from: message.chapter&.phone_number,
@@ -19,6 +26,7 @@ class Message::DeliverJob < ApplicationJob
     )
     message.update!(status: result.status == "sent" ? "sent" : "queued", provider_sid: result.sid, sent_at: Time.current)
   rescue Sms::Error => e
+    message.organization.release_sms_hold!(message)
     message.update!(status: "failed", error_message: e.message)
   end
 

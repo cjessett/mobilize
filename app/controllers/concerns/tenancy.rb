@@ -4,12 +4,16 @@ module Tenancy
 
   included do
     before_action :set_current_membership
-    helper_method :current_membership, :current_organization
+    helper_method :current_membership, :current_organization, :current_superadmin?
   end
 
   class_methods do
     def require_admin(**options)
       before_action :require_admin_membership, **options
+    end
+
+    def require_superadmin(**options)
+      before_action :require_superadmin_user, **options
     end
   end
 
@@ -23,8 +27,13 @@ module Tenancy
 
   def current_membership = Current.membership
   def current_organization = Current.organization
+  def current_superadmin? = Current.user&.superadmin? || false
 
   def require_admin_membership
     redirect_to root_path, alert: "You don't have permission to do that." unless current_membership&.admin?
+  end
+
+  def require_superadmin_user
+    redirect_to root_path, alert: "You don't have permission to do that." unless current_superadmin?
   end
 end

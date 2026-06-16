@@ -8,8 +8,14 @@
       <%= form.text_field :name, required: true, class: ui_input %>
     <% end %>
 
-    <%= form_row "Phone number", hint: "Texts and calls to this chapter's people are sent from this number." do %>
-      <%= form.telephone_field :phone_number, placeholder: "+15551234567", class: ui_input %>
+    <%= form_row "Phone number", hint: "Texts to this chapter's people are sent from this number." do %>
+      <% if chapter.phone_number.present? %>
+        <p class="text-lg font-medium text-gray-900 dark:text-white"><%= format_phone(chapter.phone_number) %>
+          <% if chapter.provisioned_at.present? %><%= status_pill "Provisioned", :green %><% end %>
+        </p>
+      <% else %>
+        <p class="text-sm text-gray-500 dark:text-slate-400">No number yet. Provision one below by area code.</p>
+      <% end %>
     <% end %>
 
     <%= form_row "Zip codes", hint: "People with these zip codes are automatically assigned to this chapter." do %>

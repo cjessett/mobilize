@@ -18,4 +18,8 @@ class User < ApplicationRecord
   def name
     person&.name || email_address
   end
+
+  # Platform-level operator. Can grant Twilio credits to any org (bypassing
+  # Stripe) — distinct from per-org admin roles.
+  def superadmin? = superadmin
 end
