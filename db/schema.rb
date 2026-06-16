@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_13_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_16_000002) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -332,6 +332,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_13_000004) do
     t.datetime "created_at", null: false
     t.string "direction", null: false
     t.string "error_message"
+    t.bigint "hold_microcents"
     t.integer "num_segments"
     t.integer "organization_id", null: false
     t.integer "person_id", null: false
@@ -365,6 +366,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_13_000004) do
     t.bigint "auto_recharge_threshold_microcents"
     t.bigint "balance_microcents", default: 0, null: false
     t.datetime "created_at", null: false
+    t.bigint "held_microcents", default: 0, null: false
     t.string "name", null: false
     t.integer "parent_id"
     t.string "slug", null: false
@@ -504,6 +506,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_13_000004) do
     t.string "email_address", null: false
     t.string "password_digest", null: false
     t.integer "person_id"
+    t.boolean "superadmin", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["person_id"], name: "index_users_on_person_id"

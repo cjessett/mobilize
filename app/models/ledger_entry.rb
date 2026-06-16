@@ -1,5 +1,5 @@
 class LedgerEntry < ApplicationRecord
-  ENTRY_TYPES = %w[topup charge refund adjustment].freeze
+  ENTRY_TYPES = %w[topup charge grant refund adjustment].freeze
 
   belongs_to :organization
   belongs_to :message, optional: true

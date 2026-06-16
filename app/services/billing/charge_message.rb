@@ -1,7 +1,7 @@
 module Billing
-  # Records the real cost of a delivered message against the org's balance.
-  # Called from Twilio's status callback, where the final price is reported.
-  # Idempotent: a message is only charged once.
+  # Settles the real cost of a delivered message: releases its pre-auth hold
+  # and debits the actual Twilio price against the balance. Called from
+  # Twilio's status callback. Idempotent — a message is only charged once.
   class ChargeMessage
     def initialize(message)
       @message = message
@@ -9,7 +9,7 @@ module Billing
 
     def call(twilio_price: nil)
       org = @message.organization
-      return unless org.billing_active?
+      return unless org.sms_billable?
       return if @message.cost_microcents.present?
 
       provider_cost = if twilio_price.present?
@@ -18,26 +18,15 @@ module Billing
         Sms::Pricing.estimate_microcents(@message.body)
       end
 
-      cost = with_markup(provider_cost, org.sms_markup_bps)
+      cost = Billing.with_markup(provider_cost, org.sms_markup_bps)
 
       @message.update!(
         provider_cost_microcents: provider_cost,
         cost_microcents: cost,
         num_segments: Sms::Pricing.segments(@message.body)
       )
-      org.record_ledger_entry!(
-        entry_type: "charge",
-        amount_microcents: -cost,
-        message: @message,
-        description: "SMS to #{@message.person.phone}"
-      )
+      org.settle_sms_charge!(message: @message, amount_microcents: cost)
       AutoRecharge.new(org).call
-    end
-
-    private
-
-    def with_markup(provider_cost, markup_bps)
-      (provider_cost * (10_000 + markup_bps) / 10_000.0).ceil
     end
   end
 end

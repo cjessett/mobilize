@@ -27,7 +27,7 @@ module Sms
 
     def charge_for_number
       org = @chapter.organization
-      return unless org.billing_active?
+      return unless org.sms_billable?
 
       org.record_ledger_entry!(
         entry_type: "charge",

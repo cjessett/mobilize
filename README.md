@@ -104,8 +104,14 @@ Organizations pay for their own SMS usage via a prepaid balance. Because each
 text costs a fraction of a cent — far less than Stripe's per-charge fee — the
 card isn't charged per message. Instead an org **tops up** a dollar balance
 (Settings → Billing), and each message is debited at Twilio's actual cost
-(captured from the status callback). When a card is on file, sending is gated
-on a positive balance; orgs that haven't set up billing are unaffected.
+(captured from the status callback).
+
+**Pre-auth holds:** before a message is sent, its estimated cost is *reserved*
+against the balance (so a large blast can't overspend while prices are still
+settling). The hold is released and replaced by the real charge when Twilio
+reports the final price. A reconcile job (`Billing::ReconcileHoldsJob`, hourly)
+settles any holds whose status callback never arrived. The Billing page shows
+both the total balance and the amount currently held / available.
 
 1. Set env vars: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and
    `STRIPE_WEBHOOK_SECRET`.
@@ -119,6 +125,25 @@ on a positive balance; orgs that haven't set up billing are unaffected.
 
 Without `STRIPE_SECRET_KEY` the app uses an in-memory fake (card always on
 file, top-ups succeed instantly) so the flow is fully demoable offline.
+
+### Granting credits without a card (cash payments)
+
+Platform **superadmins** (`users.superadmin`) can credit an org directly,
+bypassing Stripe — e.g. when an org pays by cash or check. Org admins cannot
+grant credits to themselves. Two ways:
+
+- **In-app:** Settings → Billing shows a "Grant credits" panel to superadmins.
+- **CLI (any org, by slug):** `bin/rails "billing:grant[riverside,50,Paid cash]"`
+
+Grants appear in the org's ledger as `grant` entries.
+
+### Feature flag (LaunchDarkly)
+
+The entire feature — number provisioning, billing UI, balance gating, and
+per-message charging — is gated on the LaunchDarkly flag `chapter_billing`,
+evaluated per organization. Set `LAUNCHDARKLY_SDK_KEY` to enable. Without it,
+an in-memory fake is used that defaults the flag **on** outside production and
+**off** in production (fail-closed); tests toggle it per org.
 
 ## Development
 

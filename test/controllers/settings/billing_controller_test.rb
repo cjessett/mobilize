@@ -40,4 +40,33 @@ class Settings::BillingControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     assert @org.reload.stripe_customer_id.present?
   end
+
+  test "billing page is hidden when the feature flag is off" do
+    sign_in_as users(:one)
+    disable_billing_feature(@org)
+    get settings_billing_url
+    assert_redirected_to settings_organization_path
+  end
+
+  test "superadmin can grant credits" do
+    sign_in_as users(:one) # superadmin in fixtures
+    @org.update!(balance_microcents: 0)
+
+    post grant_settings_billing_url, params: { amount: "50", note: "cash" }
+
+    assert_redirected_to settings_billing_path
+    assert_equal Money.from_dollars(50), @org.reload.balance_microcents
+    assert_equal "grant", @org.ledger_entries.recent_first.first.entry_type
+  end
+
+  test "non-superadmin admin cannot grant credits" do
+    users(:one).update!(superadmin: false)
+    sign_in_as users(:one)
+    @org.update!(balance_microcents: 0)
+
+    post grant_settings_billing_url, params: { amount: "50" }
+
+    assert_redirected_to root_url
+    assert_equal 0, @org.reload.balance_microcents
+  end
 end

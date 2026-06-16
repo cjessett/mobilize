@@ -24,12 +24,30 @@ class LedgerEntryTest < ActiveSupport::TestCase
     assert @org.billing_active?
   end
 
-  test "sms_blocked? only when active and out of funds" do
-    @org.update!(stripe_customer_id: "cus_x", balance_microcents: 0)
-    assert @org.sms_blocked?
-    @org.update!(balance_microcents: 1)
-    assert_not @org.sms_blocked?
-    @org.update!(stripe_customer_id: nil, balance_microcents: 0)
-    assert_not @org.sms_blocked?
+  test "sms_billable? requires the feature flag and an active customer" do
+    @org.update!(stripe_customer_id: "cus_x")
+    assert @org.sms_billable?
+
+    disable_billing_feature(@org)
+    assert_not @org.sms_billable?
+
+    FeatureFlags.provider = FeatureFlags::FakeProvider.new
+    @org.update!(stripe_customer_id: nil)
+    assert_not @org.sms_billable?
+  end
+
+  test "available balance subtracts held funds" do
+    @org.update!(balance_microcents: Money.from_dollars(20), held_microcents: 5_000)
+    assert_equal Money.from_dollars(20) - 5_000, @org.available_microcents
+  end
+
+  test "grant_credits! adds a positive grant entry" do
+    @org.update!(balance_microcents: 0)
+    @org.grant_credits!(amount_microcents: Money.from_dollars(50), description: "Paid cash")
+
+    entry = @org.ledger_entries.recent_first.first
+    assert_equal "grant", entry.entry_type
+    assert_equal Money.from_dollars(50), @org.reload.balance_microcents
+    assert_raises(ArgumentError) { @org.grant_credits!(amount_microcents: 0) }
   end
 end

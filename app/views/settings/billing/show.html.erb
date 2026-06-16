@@ -17,6 +17,12 @@
       <p class="mt-1 text-sm text-gray-400 dark:text-slate-500">
         Messages are billed at Twilio's per-message cost against this balance.
       </p>
+      <% if @organization.held_microcents.positive? %>
+        <p class="mt-2 text-sm text-gray-500 dark:text-slate-400">
+          <%= Money.format(@organization.held_microcents) %> held for in-flight messages ·
+          <span class="font-medium"><%= @organization.available_display %> available</span>
+        </p>
+      <% end %>
 
       <%= form_with url: topup_settings_billing_path, method: :post, class: "mt-5 flex items-end gap-3" do |form| %>
         <div>
@@ -45,6 +51,30 @@
       <% end %>
     </div>
   </div>
+
+  <!-- Superadmin: grant credits (bypasses Stripe) -->
+  <% if current_superadmin? %>
+    <div class="px-4 md:px-6 pb-6">
+      <div class="rounded-xl border border-amber-300 dark:border-amber-500/40 bg-amber-50/60 dark:bg-amber-500/5 p-6">
+        <p class="text-xs font-semibold tracking-widest text-amber-600 dark:text-amber-400 uppercase">Superadmin · Grant credits</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">Add credits without charging a card — e.g. when this org paid by cash.</p>
+        <%= form_with url: grant_settings_billing_path, method: :post, class: "mt-4 flex flex-wrap items-end gap-3" do |form| %>
+          <div>
+            <label class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Amount (USD)</label>
+            <div class="mt-1 flex items-center gap-1">
+              <span class="text-gray-500 dark:text-slate-400">$</span>
+              <%= form.number_field :amount, min: 1, step: 1, required: true, class: ui_input + " w-28" %>
+            </div>
+          </div>
+          <div class="flex-1 min-w-[12rem]">
+            <label class="text-xs font-semibold tracking-widest text-gray-400 dark:text-slate-500 uppercase">Note (optional)</label>
+            <%= form.text_field :note, placeholder: "Cash payment, check #123…", class: ui_input + " mt-1" %>
+          </div>
+          <%= form.submit "Grant credits", class: "rounded-md px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-white font-medium cursor-pointer" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Ledger -->
   <div class="px-4 md:px-6 pb-6">

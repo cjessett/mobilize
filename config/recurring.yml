@@ -16,3 +16,6 @@ production:
   generate_recurring_event_sessions:
     command: "Event::GenerateSessionsJob.generate_all"
     schedule: at 4am every day
+  reconcile_billing_holds:
+    class: Billing::ReconcileHoldsJob
+    schedule: every hour at minute 27

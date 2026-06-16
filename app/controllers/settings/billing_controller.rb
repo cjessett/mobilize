@@ -1,5 +1,7 @@
 class Settings::BillingController < ApplicationController
   require_admin
+  require_superadmin only: :grant
+  before_action :require_billing_feature
 
   def show
     @organization = current_organization
@@ -26,5 +28,27 @@ class Settings::BillingController < ApplicationController
     redirect_to settings_billing_path, alert: "Enter a valid dollar amount."
   rescue Billing::Error => e
     redirect_to settings_billing_path, alert: e.message
+  end
+
+  # Superadmin-only: credit an org without charging a card (e.g. paid in cash).
+  def grant
+    dollars = BigDecimal(params[:amount].to_s)
+    raise ArgumentError if dollars <= 0
+
+    current_organization.grant_credits!(
+      amount_microcents: Money.from_dollars(dollars),
+      description: "Credit grant#{params[:note].present? ? ": #{params[:note]}" : ''}"
+    )
+    redirect_to settings_billing_path, notice: "Granted #{Money.format(Money.from_dollars(dollars))} in credits."
+  rescue ArgumentError, TypeError
+    redirect_to settings_billing_path, alert: "Enter a valid grant amount."
+  end
+
+  private
+
+  def require_billing_feature
+    return if current_organization&.billing_feature_enabled?
+
+    redirect_to settings_organization_path, alert: "Billing isn't enabled for this organization."
   end
 end

@@ -100,6 +100,7 @@ Rails.application.routes.draw do
     resource :billing, only: :show, controller: :billing do
       post :add_payment_method
       post :topup
+      post :grant
     end
     resources :members, only: [ :index, :new, :create, :destroy ]
     resources :custom_fields, only: [ :index, :create, :destroy ]
